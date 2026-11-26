@@ -61,7 +61,7 @@ section.band{padding:64px 0}
 section.white{background:var(--card)}
 .sec-head{max-width:44em;margin-bottom:30px}.sec-head p{margin-top:10px}
 .panel{background:var(--card);border:1px solid var(--line);padding:26px}
-.formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.formgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:end}
 .formgrid .wide{grid-column:span 2}.formgrid .full{grid-column:1/-1}
 label.f{display:block;font-weight:700;font-size:.92rem;margin-bottom:5px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}

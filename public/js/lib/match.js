@@ -35,7 +35,7 @@ export function readCriteria(title, description = "") {
     const soft = /prefer|plus|bonus|advantage|desirable|good to have|nice to have|or equivalent|or related/i.test(sentence);
     hits.forEach(h => (soft ? preferred : degrees).push(h));
   }
-  const cg = text.match(/(?:minimum|min\.?|at least|above)\s*(?:of\s*)?(\d(?:\.\d{1,2})?)\s*(?:\+\s*)?(?:CGPA|CPI|GPA)|(?:CGPA|CPI|GPA)\s*(?:of|:|>=?|above)?\s*(\d(?:\.\d{1,2})?)\s*(?:\+|and above|or above|or higher)/i);
+  const cg = text.match(/(?:minimum|min\.?|at least|above)\s*(?:of\s*)?(\d(?:\.\d{1,2})?)\s*(?:\+\s*)?(?:CGPA|CPI|GPA)|(?:CGPA|CPI|GPA)\s*(?:of|:|>=?|above)?\s*(\d(?:\.\d{1,2})?)\s*(?:\+|and above|or above|or higher)|(?:minimum|min\.?|at least)\s*(?:of\s*)?(?:an?\s*)?(?:CGPA|CPI|GPA)\s*(?:of|:)?\s*(\d(?:\.\d{1,2})?)(?!\d)/i);
 
   return {
     minExp, maxExp, fresherWelcome,
@@ -43,7 +43,7 @@ export function readCriteria(title, description = "") {
     batches: [...batches].sort(),
     degrees: [...new Set(degrees)],
     preferredDegrees: [...new Set(preferred)],
-    minCgpa: cg ? +(cg[1] || cg[2]) : null
+    minCgpa: cg && +(cg[1] || cg[2] || cg[3]) <= 10 ? +(cg[1] || cg[2] || cg[3]) : null
   };
 }
 
@@ -72,11 +72,13 @@ export function checkEligibility(profile, job) {
   const c = job.criteria, checks = [];
   const add = (name, state, detail) => checks.push({ name, state, detail });
   const exp = profile.experienceYears || 0;
+  const months = profile.experienceMonths ?? Math.round(exp * 12);
+  const expText = months < 24 ? `${months} month${months === 1 ? "" : "s"}` : `${Math.round(exp * 10) / 10} years`;
 
   if (c.minExp !== null && c.minExp > 0) {
     const gap = c.minExp - exp;
     add("Experience", gap <= 0 ? "pass" : gap <= 1 ? "check" : "fail",
-      `Asks for ${c.minExp}${c.maxExp ? ` to ${c.maxExp}` : "+"} years. Your full-time experience is ${exp}.`);
+      `Asks for ${c.minExp}${c.maxExp ? ` to ${c.maxExp}` : "+"} years. Your full-time experience is ${expText}.`);
   } else if (c.fresherWelcome || c.minExp === 0) add("Experience", "pass", "Open to students or freshers.");
 
   if (!c.internship) {
@@ -96,8 +98,9 @@ export function checkEligibility(profile, job) {
   }
 
   if (c.minCgpa) {
+    const yours = [profile.cgpaUg != null && `UG ${profile.cgpaUg}`, profile.cgpaPg != null && `PG ${profile.cgpaPg}`].filter(Boolean).join(", ") || profile.cgpa;
     if (!profile.cgpa) add("CGPA", "check", `Asks for ${c.minCgpa} or higher. Add your CGPA.`);
-    else add("CGPA", profile.cgpa >= c.minCgpa ? "pass" : "fail", `Asks for ${c.minCgpa} or higher. Yours is ${profile.cgpa}.`);
+    else add("CGPA", profile.cgpa >= c.minCgpa ? "pass" : "fail", `Asks for ${c.minCgpa} or higher. Yours: ${yours}.`);
   }
 
   let verdict = checks.some(x => x.state === "fail") ? "no" : checks.some(x => x.state === "check") ? "check" : checks.length ? "eligible" : "check";

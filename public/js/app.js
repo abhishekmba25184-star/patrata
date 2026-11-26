@@ -73,8 +73,9 @@ function skillChips() {
 function fillProfile() {
   const p = state.profile;
   $("#p-year").value = p.gradYear || "";
-  $("#p-exp").value = p.experienceYears;
-  $("#p-cgpa").value = p.cgpa || "";
+  $("#p-exp").value = p.experienceMonths ?? Math.round((p.experienceYears || 0) * 12);
+  $("#p-cgpa-ug").value = p.cgpaUg ?? "";
+  $("#p-cgpa-pg").value = p.cgpaPg ?? "";
   $("#p-city").value = p.cities[0] || "";
   toggleChips($("#p-degrees"), DEGREES.map(d => [d.id, d.label]), p.degrees);
   toggleChips($("#p-roles"), Object.keys(ROLE_FAMILIES).map(r => [r, r]), p.roles);
@@ -93,8 +94,12 @@ $("#addskill").addEventListener("submit", e => {
 $("#find").addEventListener("click", async () => {
   const p = state.profile;
   p.gradYear = +$("#p-year").value || null;
-  p.experienceYears = Math.max(0, +$("#p-exp").value || 0);
-  p.cgpa = +$("#p-cgpa").value || null;
+  p.experienceMonths = Math.max(0, Math.round(+$("#p-exp").value || 0));
+  p.experienceYears = Math.round((p.experienceMonths / 12) * 100) / 100;
+  const score = id => { const v = +$(id).value; return v > 0 && v <= 10 ? v : null; };
+  p.cgpaUg = score("#p-cgpa-ug"); p.cgpaPg = score("#p-cgpa-pg");
+  const known = [p.cgpaUg, p.cgpaPg].filter(v => v != null);
+  p.cgpa = known.length ? Math.min(...known) : null;
   p.cities = $("#p-city").value ? [$("#p-city").value] : [];
   if (!p.roles.length) { $("#findmsg").textContent = "Choose at least one kind of role."; return; }
   $("#findmsg").textContent = "";
@@ -114,13 +119,17 @@ async function getJson(url) {
 }
 async function loadJobs(p) {
   const city = p.cities[0] || "";
-  const [stored, ...live] = await Promise.all([
-    getJson("/data/jobs.json"),
-    ...p.roles.slice(0, 2).map(r => getJson(`/api/jobs?${new URLSearchParams({ role: r, city, level: p.experienceYears < 1 ? "entry" : "any" })}`))
+  const shard = r => (r ? r.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "other");
+  const [shards, live] = await Promise.all([
+    Promise.all([...p.roles, ""].map(r => getJson(`/data/jobs/${shard(r)}.json`))),
+    Promise.all(p.roles.slice(0, 3).map(r => getJson(`/api/jobs?${new URLSearchParams({ role: r, city, level: p.experienceYears < 1 ? "entry" : "any" })}`)))
   ]);
+  // Before the first daily refresh, the split files do not exist yet.
+  const stored = shards.some(Boolean) ? { updated: shards.find(Boolean).updated, jobs: shards.flatMap(x => x?.jobs || []) } : await getJson("/data/jobs.json");
   let jobs = stored?.jobs || [];
   state.updated = stored?.updated || null;
   jobs = jobs.concat(live.flatMap(x => x?.jobs || []).map(normaliseJob));
+  state.liveCount = live.reduce((n, x) => n + (x?.jobs?.length || 0), 0);
   state.sample = !jobs.length;
   if (state.sample) jobs = ((await getJson("/data/sample-jobs.json"))?.jobs || []).map(normaliseJob);
   const seen = new Set();

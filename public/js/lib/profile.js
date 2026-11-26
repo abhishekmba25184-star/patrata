@@ -17,7 +17,7 @@ export const DEGREES = [
   { id: "ca", label: "CA", level: "pro", re: /\bchartered accountan(t|cy)\b|\bCA (final|inter|intermediate)\b/i }
 ];
 
-const HEADING = /^\s*(education|academics?|academic (qualifications?|background|details)|work experience|professional experience|experience|employment( history)?|internships?|summer internship|projects?|skills|technical skills|key skills|certifications?|achievements?|awards?|positions? of responsibility|extra.?curriculars?( activities)?|activities|summary|profile|objective|publications?|interests|languages)\s*:?\s*$/i;
+const HEADING = /^\s*(education(al)?( qualifications?| details| background)?|academics?|academic (qualifications?|background|details|profile)|scholastic (achievements|record)|work ex(perience)?|professional experience|corporate experience|industry experience|full.?time experience|relevant experience|experience|employment( history)?|internships?( experience)?|summer internships?( project)?|projects?|skills|technical skills|key skills|certifications?|achievements?|awards?|positions? of responsibility|extra.?curriculars?( activities)?|activities|summary|profile|objective|publications?|interests|languages)\s*:?\s*$/i;
 
 // PDF text breaks long points over several lines. Join them back together.
 export function joinWrapped(text) {
@@ -33,25 +33,38 @@ export function joinWrapped(text) {
   return out.join("\n");
 }
 
+// A length such as "13 months", "1 year 1 month", "(1.5 yrs)" at the end of a line.
+const DURATION = /[\s|:(\[–—-]*(?:total\s*[:\-–]?\s*)?(\d{1,2}(?:\.\d{1,2})?)\s*\+?\s*(years?|yrs?|months?|mos?)\b(?:\s*(?:and\s*)?(\d{1,2})\s*(?:months?|mos?)\b)?[\s)\]]*$/i;
+export function durationMonths(m) {
+  if (!m) return null;
+  const n = parseFloat(m[1]);
+  return Math.round(/^y/i.test(m[2]) ? n * 12 + (+m[3] || 0) : n);
+}
+
 export function splitSections(text) {
-  const out = { top: [] };
+  const out = { top: [] }, stated = {};
   let key = "top";
   for (const line of text.split("\n")) {
-    const m = line.length < 60 && line.match(HEADING);
+    const d = line.length < 80 ? line.match(DURATION) : null;
+    const base = d ? line.slice(0, d.index) : line;
+    const m = base.length < 60 && base.match(HEADING);
     if (m) {
       const h = m[1].toLowerCase();
-      key = /intern/.test(h) ? "internship" : /experience|employment/.test(h) ? "experience" : /educat|academic/.test(h) ? "education" : /project/.test(h) ? "projects" : /skill/.test(h) ? "skills" : /summary|profile|objective/.test(h) ? "summary" : h;
+      key = /intern/.test(h) ? "internship" : /experience|employment|work ex/.test(h) ? "experience" : /educat|academic|scholastic/.test(h) ? "education" : /project/.test(h) ? "projects" : /skill/.test(h) ? "skills" : /summary|profile|objective/.test(h) ? "summary" : h;
       out[key] ||= [];
+      if (d) stated[key] = durationMonths(d);
     } else out[key].push(line);
   }
-  return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, v.join("\n")]));
+  const sections = Object.fromEntries(Object.entries(out).map(([k, v]) => [k, v.join("\n")]));
+  Object.defineProperty(sections, "stated", { value: stated });
+  return sections;
 }
 
 // Month ranges such as "Jun 2023 - Present", "April 2025 – June 2025", "06/2022 to 08/2023".
 export function dateRanges(text, now = new Date()) {
   const mon = "(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?";
   const point = `(?:${mon}\\s*['’,-]?\\s*(\\d{4}|\\d{2})|(\\d{1,2})\\/(\\d{4}))`;
-  const re = new RegExp(`${point}\\s*(?:-|–|—|to)\\s*(?:${point}|(present|current|till date|ongoing|now))`, "gi");
+  const re = new RegExp(`${point}\\s*(?:-|–|—|to)\\s*(?:${point}|(present|current|till date|till now|to date|ongoing|now|date))`, "gi");
   const year = y => (y.length === 2 ? 2000 + +y : +y);
   const found = [];
   for (const line of text.split("\n")) {
@@ -71,6 +84,36 @@ function totalMonths(ranges) {
     if (r.end >= start) { total += r.end - start + 1; lastEnd = r.end; }
   }
   return total;
+}
+
+const SCHOOL = /\b(class|std\.?|grade)\s*(x|xii|10|12)(th)?\b|\b(10th|12th|hsc|ssc|cbse|icse|isc|secondary|senior secondary|higher secondary|matriculation|intermediate|high school)\b/i;
+const keep = v => (v >= 4 && v <= 10 ? v : null);
+
+// CGPA values written on one line, ignoring years, dates and percentages.
+export function scoresIn(line) {
+  const t = line.replace(/\b\d{1,2}\/(19|20)\d{2}\b/g, " ").replace(/\b(19|20)\d{2}\b(\s*[-–]\s*\d{2,4}\b)?/g, " ");
+  const out = [];
+  for (const m of t.matchAll(/(?:C\.?G\.?P\.?A|CPI|GPA|SGPA)\b[^\d\n]{0,25}?(\d{1,2}(?:\.\d{1,2})?)(?!\s*%|\d)(\s*\/\s*(10|4)\b)?/gi))
+    if (m[3] !== "4") out.push(keep(+m[1]));
+  for (const m of t.matchAll(/(?<![\d.])(\d{1,2}(?:\.\d{1,2})?)\s*\/\s*10\b/g)) out.push(keep(+m[1]));
+  for (const m of t.matchAll(/(?<![\d.\/])(\d\.\d{1,2})(?![\d.%]|\s*\/\s*4|\s*%)/g)) out.push(keep(+m[1]));
+  return out.filter(v => v != null);
+}
+
+// UG and PG CGPA, each taken from the row of that degree.
+export function readCgpa(eduText) {
+  const res = { pg: null, ug: null, other: null };
+  let level = null;
+  for (const line of eduText.split("\n")) {
+    const deg = DEGREES.find(d => d.level !== "pro" && d.re.test(line));
+    if (SCHOOL.test(line) && !deg) level = "school";
+    else if (deg) level = deg.level;
+    const [v] = scoresIn(line);
+    if (v == null) continue;
+    if (level === "pg" || level === "ug") { if (res[level] == null) res[level] = v; }
+    else if (level !== "school" && res.other == null) res.other = v;
+  }
+  return res;
 }
 
 function guessName(lines) {
@@ -97,15 +140,25 @@ export function parseProfile(text, now = new Date()) {
     .filter(y => y >= 2000 && y <= now.getFullYear() + 5);
   const gradYear = years.length ? Math.max(...years) : null;
 
-  const cgpaMatch = eduText.match(/(?:CGPA|CPI|GPA)\s*[:\-–]?\s*(\d(?:\.\d{1,2})?)\s*(?:\/\s*(10|4))?/i) || eduText.match(/\b(\d\.\d{1,2})\s*\/\s*(10)\b/);
-  const cgpa = cgpaMatch && cgpaMatch[2] !== "4" ? +cgpaMatch[1] : null;
+  const sc = readCgpa(eduText);
+  const hasPg = degrees.some(d => DEGREES.find(x => x.id === d)?.level === "pg");
+  const cgpaPg = sc.pg ?? (hasPg && sc.ug == null ? sc.other : null);
+  const cgpaUg = sc.ug ?? (!hasPg && sc.pg == null ? sc.other : null);
+  const known = [cgpaPg, cgpaUg].filter(v => v != null);
+  const cgpa = known.length ? Math.min(...known) : null;
 
-  const workRanges = dateRanges([sec.experience, sec.internship].filter(Boolean).join("\n"), now);
-  const internRanges = [...dateRanges(sec.internship || "", now), ...dateRanges(sec.experience || "", now).filter(r => r.intern)];
+  // With no work headings found, read dates from everything except education.
+  const noHeadings = sec.experience === undefined && sec.internship === undefined;
+  const expText = noHeadings ? lines.filter(l => !eduText.includes(l) || !sec.education).join("\n") : sec.experience || "";
+  const internRanges = [...dateRanges(sec.internship || "", now), ...dateRanges(expText, now).filter(r => r.intern)];
   const internKeys = new Set(internRanges.map(r => `${r.start}-${r.end}`));
-  const fullTime = workRanges.filter(r => !internKeys.has(`${r.start}-${r.end}`));
-  const experienceYears = Math.round((totalMonths(fullTime) / 12) * 2) / 2;
-  const internshipMonths = totalMonths(internRanges);
+  const fullTime = dateRanges(expText, now).filter(r => !r.intern && !internKeys.has(`${r.start}-${r.end}`));
+  // A total the student wrote ("Work Experience: 13 months") wins over dates.
+  const statedLine = clean.match(/(?:total|overall|full[- ]?time|work|professional)\s*(?:work\s*)?ex(?:perience|p\.?)?\b[^\n\d]{0,12}(\d{1,2}(?:\.\d{1,2})?)\s*\+?\s*(years?|yrs?|months?|mos?)\b(?:\s*(?:and\s*)?(\d{1,2})\s*(?:months?|mos?)\b)?/i);
+  const stated = sec.stated.experience ?? durationMonths(statedLine);
+  const experienceMonths = stated ?? totalMonths(fullTime);
+  const experienceYears = Math.round((experienceMonths / 12) * 100) / 100;
+  const internshipMonths = sec.stated.internship ?? totalMonths(internRanges);
 
   const skills = findSkills(clean);
   const roles = Object.entries(ROLE_FAMILIES)
@@ -117,8 +170,8 @@ export function parseProfile(text, now = new Date()) {
     .filter(([, s]) => s >= 1.5).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n]) => n);
 
   return {
-    name: guessName(lines), email, phone, degrees, gradYear, cgpa,
-    experienceYears, internshipMonths, skills, roles,
+    name: guessName(lines), email, phone, degrees, gradYear, cgpa, cgpaUg, cgpaPg,
+    experienceMonths, experienceYears, internshipMonths, skills, roles,
     cities: findCities(sec.top || "").slice(0, 1)
   };
 }
