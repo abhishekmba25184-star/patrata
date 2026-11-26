@@ -1,0 +1,30 @@
+name: Refresh jobs and search pages
+on:
+  schedule:
+    - cron: "30 0 * * *"   # 6:00 am India time, every day
+    - cron: "30 9 * * *"   # 3:00 pm India time
+  workflow_dispatch:
+  push:
+    paths: ["site.config.json", "scripts/**"]
+permissions:
+  contents: write
+concurrency:
+  group: refresh-jobs
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Collect openings
+        run: node scripts/fetch-jobs.mjs
+      - name: Rebuild pages
+        run: node scripts/build-pages.mjs
+      - name: Save changes
+        run: |
+          git config user.name "jobs-bot"
+          git config user.email "jobs-bot@users.noreply.github.com"
+          git add -A public
+          git diff --cached --quiet || (git commit -m "Daily job refresh" && git push)
