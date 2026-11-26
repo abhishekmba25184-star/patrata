@@ -36,13 +36,20 @@ const MAX_PER_COMPANY = 300;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// Waits and tries again when a site says "too many requests".
-async function getJson(url, init = {}, retries = 4) {
+// Time limits keep every run well inside GitHub's 90-minute cap, so results are always saved.
+const START = Date.now();
+const MIN = 60 * 1000;
+export const LIMITS = { discoverMinutes: +process.env.DISCOVER_MINUTES || 15, discoverBatch: 150, collectMinutes: +process.env.COLLECT_MINUTES || 55 };
+const pastCollectDeadline = () => Date.now() - START > LIMITS.collectMinutes * MIN;
+
+// Waits and tries again (briefly) when a site says "too many requests".
+async function getJson(url, init = {}, retries = 2) {
   for (let attempt = 0; ; attempt++) {
-    const r = await fetch(url, { ...init, signal: AbortSignal.timeout(30000), headers: { ...UA, ...(init.headers || {}) } });
+    if (pastCollectDeadline()) throw new Error("skipped: time budget used");
+    const r = await fetch(url, { ...init, signal: AbortSignal.timeout(20000), headers: { ...UA, ...(init.headers || {}) } });
     if (r.ok) return r.json();
     if ((r.status === 429 || r.status === 503) && attempt < retries) {
-      const wait = Math.min(20, +r.headers.get("retry-after") || 5 * 2 ** attempt);
+      const wait = Math.min(10, +r.headers.get("retry-after") || 3 * 2 ** attempt);
       await sleep(wait * 1000);
       continue;
     }
@@ -110,9 +117,10 @@ const WORKDAY_MAX = 150;
 // Workday sites limit request rates. Each company gets a few minutes at most, and all Workday
 // companies together get a time budget, so one slow site cannot hold up the daily refresh.
 const WORKDAY_BUDGET = 25 * 60 * 1000;
-const runStart = Date.now();
+let workdayStart = 0;
 async function workday(c) {
-  if (Date.now() - runStart > WORKDAY_BUDGET) throw new Error("skipped: time budget used");
+  workdayStart ||= Date.now();
+  if (Date.now() - workdayStart > WORKDAY_BUDGET) throw new Error("skipped: time budget used");
   const deadline = Date.now() + 4 * 60 * 1000;
   const api = `https://${c.host}/wday/cxs/${c.tenant}/${c.site}`;
   const post = body => getJson(`${api}/jobs`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }, 2);
@@ -165,13 +173,13 @@ const BOARDS = {
   workday: { run: workday }
 };
 
-async function fetchCompany(c) {
+async function fetchCompany(c, retries = 2) {
   const board = BOARDS[c.ats];
   if (!board) throw new Error(`unknown ats ${c.ats}`);
   if (board.run) return board.run(c);
   let last = "";
   for (const url of board.urls(encodeURIComponent(c.slug))) {
-    try { return board.map(await getJson(url), c.name); } catch (e) { last = e.message; }
+    try { return board.map(await getJson(url, {}, retries), c.name); } catch (e) { last = e.message; }
   }
   throw new Error(last);
 }
@@ -188,21 +196,23 @@ export function slugGuesses(name) {
   for (const s of new Set([flat, dashed])) tries.push({ ats: "recruitee", slug: s }, { ats: "workable", slug: s });
   return tries;
 }
-async function discover(name) {
+async function discover(name, deadline) {
+  let unsure = false; // a refusal or timeout is not proof that the board does not exist
   for (const t of slugGuesses(name)) {
+    if (Date.now() > deadline) return undefined; // not finished: try again next run
     const c = { name, ...t };
     try {
       if (t.ats === "smartrecruiters") {
-        const b = await getJson(`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(t.slug)}/postings?country=in&limit=1`);
+        const b = await getJson(`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(t.slug)}/postings?country=in&limit=1`, {}, 0);
         if (b.totalFound > 0) return c;
         continue;
       }
       // Accept a board only if it has openings in India, so a same-named company abroad is not mixed in.
-      const jobs = await fetchCompany(c);
+      const jobs = await fetchCompany(c, 0);
       if (jobs.some(j => inIndia(`${j.location}; ${j.where}`))) return c;
-    } catch { /* not on this system */ }
+    } catch (e) { if (!/HTTP 404|HTTP 410|HTTP 400/.test(e.message)) unsure = true; }
   }
-  return null;
+  return unsure ? undefined : null;
 }
 
 const slug = s => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -214,15 +224,19 @@ async function main() {
   const listed = new Set(config.companies.map(c => c.name.toLowerCase()));
   const week = 7 * 864e5, now = Date.now();
   const toProbe = (config.discover || []).filter(n => !listed.has(n.toLowerCase()) && !(known[n] && (known[n].ats || now - Date.parse(known[n].checked) < week)));
-  const found = await pool(toProbe, 8, async n => ({ n, hit: await discover(n) }));
-  for (const { n, hit } of found.filter(Boolean)) known[n] = hit ? { ats: hit.ats, slug: hit.slug, checked: new Date().toISOString() } : { checked: new Date().toISOString() };
-  console.log(`Discovery: checked ${toProbe.length}, found ${found.filter(f => f?.hit).length}`);
+  // A batch per run, within a time limit; the rest are checked on later runs.
+  const batch = toProbe.slice(0, LIMITS.discoverBatch), stopAt = Date.now() + LIMITS.discoverMinutes * MIN;
+  const found = await pool(batch, 6, async n => ({ n, hit: await discover(n, stopAt) }));
+  const done = found.filter(f => f && f.hit !== undefined);
+  for (const { n, hit } of done) known[n] = hit ? { ats: hit.ats, slug: hit.slug, checked: new Date().toISOString() } : { checked: new Date().toISOString() };
+  console.log(`Discovery: checked ${done.length} of ${toProbe.length} waiting, found ${done.filter(f => f.hit).length}`);
   const companies = [...config.companies, ...(config.discover || []).filter(n => !listed.has(n.toLowerCase()) && known[n]?.ats).map(n => ({ name: n, ats: known[n].ats, slug: known[n].slug }))];
   const previous = await readFile(new URL("public/data/jobs.json", root)).then(JSON.parse).catch(() => ({ jobs: [] }));
   const fresh = previous.updated && Date.now() - Date.parse(previous.updated) < 3 * 864e5;
   // Workday sites share servers and limit request rates, so they go one at a time.
   const collect = async c => {
     try {
+      if (pastCollectDeadline()) throw new Error("skipped: time budget used");
       const found = (await fetchCompany(c)).filter(j => j.title && j.url && inIndia(`${j.location}; ${j.where}`)).slice(0, MAX_PER_COMPANY);
       return { c, status: "ok", jobs: found.map(j => normaliseJob({ ...j, location: inIndia(j.location) ? j.location : j.where })) };
     } catch (e) {
