@@ -13,6 +13,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,4 +28,18 @@ jobs:
           git config user.name "jobs-bot"
           git config user.email "jobs-bot@users.noreply.github.com"
           git add -A public
-          git diff --cached --quiet || (git commit -m "Daily job refresh" && git push)
+          git diff --cached --quiet && exit 0
+          git commit -m "Daily job refresh"
+          # Uploads made during the run are fetched first, so the refresh is never lost.
+          for i in 1 2 3; do
+            if git pull --rebase -X theirs origin main; then
+              node scripts/build-pages.mjs
+              git add -A public
+              git diff --cached --quiet || git commit -m "Rebuild pages with latest design"
+              git push && exit 0
+            else
+              git rebase --abort || true
+            fi
+            sleep 15
+          done
+          exit 1
