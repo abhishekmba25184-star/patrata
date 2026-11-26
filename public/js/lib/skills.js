@@ -35,7 +35,7 @@ export const SKILLS = {
   "Project Management": ["pmp", "scrum", "agile", "jira"], "Stakeholder Management": [], "PowerPoint": ["ms powerpoint", "presentation skills"],
   "Supply Chain": ["supply chain management", "scm"], "Operations": ["operations management", "process improvement"], "Logistics": ["warehouse management"],
   "Procurement": ["sourcing", "vendor management"], "Lean Six Sigma": ["six sigma", "lean manufacturing"], "Inventory Management": ["demand planning"],
-  "Recruitment": ["talent acquisition", "hiring"], "HR Operations": ["human resources", "employee engagement", "payroll", "hrms"], "Learning and Development": ["training and development"],
+  "Recruitment": ["talent acquisition", "recruiting", "campus hiring", "lateral hiring", "end-to-end hiring", "hiring process"], "HR Operations": ["human resources", "employee engagement", "payroll", "hrms"], "Learning and Development": ["training and development"],
   "AutoCAD": [], "MATLAB": [], "Communication": ["communication skills"], "Leadership": ["team leadership"]
 };
 

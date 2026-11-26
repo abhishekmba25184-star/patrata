@@ -591,6 +591,13 @@
    "host": "genpact.wd5.myworkdayjobs.com",
    "tenant": "genpact",
    "site": "Genpact_Careers"
+  },
+  {
+   "name": "Deutsche Bank",
+   "ats": "workday",
+   "host": "db.wd3.myworkdayjobs.com",
+   "tenant": "db",
+   "site": "DBWebSite"
   }
  ],
  "discover": [
@@ -976,7 +983,6 @@
   "Morgan Stanley",
   "JPMorgan Chase",
   "Citi",
-  "Deutsche Bank",
   "Barclays",
   "HSBC",
   "Standard Chartered",

@@ -1,5 +1,5 @@
 import { parseProfile, joinWrapped, DEGREES } from "./lib/profile.js";
-import { rankJobs, normaliseJob, skillUnlocks } from "./lib/match.js";
+import { rankJobs, normaliseJob, skillUnlocks, scoreJob } from "./lib/match.js";
 import { SKILLS, ROLE_FAMILIES, CITIES, findSkills } from "./lib/skills.js";
 import { readResume } from "./reader.js";
 import { initImprove, refreshImprove } from "./improve.js";
@@ -247,3 +247,71 @@ $$(".tabs button").forEach(b => b.addEventListener("click", () => selectTab(b.da
 for (const id of ["#p-city", "#f-city"]) $(id).append(...CITIES.map(c => el("option", { value: c }, c)));
 $("#skilllist").append(...Object.keys(SKILLS).map(s => el("option", { value: s })));
 initImprove(() => state);
+
+/* ---------- check a pasted job post ---------- */
+// Reads criteria from any pasted post and compares them with the student's details.
+$("#postcheck").addEventListener("click", () => {
+  const text = $("#posttext").value.trim();
+  const msg = $("#postmsg");
+  if (text.length < 60) { msg.textContent = "Paste the full post, including the role and requirements."; msg.classList.add("err"); return; }
+  msg.textContent = ""; msg.classList.remove("err");
+  const lines = text.split(/\n+/).map(l => l.trim()).filter(Boolean);
+  const titleLine = lines.find(l => /analyst|associate|intern|manager|engineer|executive|trainee|developer|consultant|officer|specialist|lead|designer/i.test(l)) || lines[0];
+  const title = titleLine.replace(/^[^\w]+/, "").slice(0, 90);
+  const links = [...new Set(text.match(/https?:\/\/[^\s)>\]]+/g) || [])].slice(0, 8);
+  const job = normaliseJob({ id: "post", title, company: "From pasted post", location: text, url: links[0] || "", source: "Pasted post", description: text });
+  const r = scoreJob(state.profile, job);
+  const VERD = { eligible: "Eligible", check: "Check criteria", no: "Not eligible yet" };
+  $("#postout").hidden = false;
+  $("#postout").replaceChildren(el("div", { class: "slip in" },
+    el("header", {}, el("div", {}, el("h2", {}, title), el("p", {}, job.cities.length ? job.cities.join(", ") : "Location not stated")), el("span", { class: `stamp ${r.verdict}` }, VERD[r.verdict])),
+    el("div", { class: "body" },
+      el("ul", { class: "checks" }, r.checks.map((c, n) => el("li", { class: c.state, style: `--n:${n}` }, el("span", { class: "tick", "aria-label": c.state }), el("b", {}, c.name), el("span", {}, c.detail)))),
+      el("div", { class: "chips", style: "margin-top:14px" }, r.matched.map(s => el("span", { class: "chip have" }, `✓ ${s}`)), r.missing.slice(0, 8).map(s => el("span", { class: "chip miss" }, `Not on resume: ${s}`))),
+      emailApply(text, title),
+      links.length && el("div", { class: "postlinks" }, el("h3", {}, "Links in the post"), el("ul", {}, links.map(u => el("li", {}, el("a", { href: safeUrl(u), target: "_blank", rel: "noopener nofollow" }, u))))),
+      el("p", { class: "actions", style: "margin-top:16px" }, el("button", { type: "button", class: "btn alt small", onclick: () => { selectTab("improve"); $("#jd").value = text; $("#jd").dispatchEvent(new Event("input")); } }, "Tailor my resume to this post")))));
+});
+
+// Posts that ask candidates to email a CV: find the address, the details asked for,
+// and draft the email in the student's own mail app.
+const FREE_MAIL = /@(gmail|yahoo|outlook|hotmail|rediffmail|ymail|live|icloud|proton(mail)?)\./i;
+const ASKS = [
+  [/current\s*ctc|present\s*ctc|current\s*salary/i, "Current CTC", () => "[your current CTC, or Fresher]"],
+  [/expected\s*ctc|expected\s*salary/i, "Expected CTC", () => "[your expected CTC]"],
+  [/notice\s*period/i, "Notice period", p => (p.experienceMonths ? "[your notice period]" : "Available to join immediately after graduation")],
+  [/current\s*location|present\s*location/i, "Current location", p => p.cities[0] || "[your city]"],
+  [/contact\s*(number|no)|mobile|phone/i, "Contact number", p => p.phone || "[your mobile number]"],
+  [/total\s*experience|years? of experience/i, "Total experience", p => (p.experienceMonths ? `${p.experienceMonths} months` : "Fresher")],
+  [/qualification|education/i, "Qualification", p => p.degrees.map(id => DEGREES.find(d => d.id === id)?.label || id).join(", ") || "[your degree]"]
+];
+function emailApply(text, title) {
+  const emails = [...new Set((text.match(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g) || []).map(e => e.replace(/[.,;]+$/, "")))];
+  if (!emails.length) return null;
+  const p = state.profile || {};
+  const to = emails[0];
+  const asked = ASKS.filter(([re]) => re.test(text));
+  const name = p.name || "[your name]";
+  const subject = `Application for ${title.split("|")[0].trim()} – ${name}`;
+  const body = [
+    "Dear Hiring Team,", "",
+    `I came across your post for ${title.split("|")[0].trim()} and would like to apply. My resume is attached.`, "",
+    ...(asked.length ? [...asked.map(([, label, fill]) => `${label}: ${fill(p)}`), ""] : []),
+    `Education: ${(p.degrees || []).map(id => DEGREES.find(d => d.id === id)?.label || id).join(", ") || "[your degree]"}${p.gradYear ? ` (${p.gradYear})` : ""}`,
+    `Key skills: ${(p.skills || []).slice(0, 6).join(", ") || "[your skills]"}`, "",
+    "I would be glad to discuss how I can contribute. Thank you for your time.", "",
+    "Regards,", name, p.phone || "[your mobile number]", p.email || ""
+  ].join("\n");
+  const free = FREE_MAIL.test(to);
+  return el("div", { class: "mailapply" },
+    el("h3", {}, "This post asks you to apply by email"),
+    el("p", {}, "Send to: ", el("b", {}, to), emails.length > 1 ? ` (also mentioned: ${emails.slice(1).join(", ")})` : ""),
+    asked.length && el("p", {}, `The recruiter asked for: ${asked.map(([, l]) => l.toLowerCase()).join(", ")}. These are in the draft below; fill in the parts in brackets.`),
+    free && el("p", { class: "warnline" }, "Careful: this is a personal email address, not a company one. Check the recruiter's profile, and never pay any fee to apply."),
+    el("label", { class: "f", for: "maildraft", style: "margin-top:10px" }, "Draft email"),
+    el("textarea", { id: "maildraft" }, body),
+    el("p", { class: "actions", style: "margin-top:10px" },
+      el("a", { class: "btn small", href: "#", onclick: e => { e.preventDefault(); location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent($("#maildraft").value)}`; } }, "Open in my email app"),
+      el("button", { type: "button", class: "btn alt small", onclick: async e => { try { await navigator.clipboard.writeText($("#maildraft").value); e.target.textContent = "Copied ✓"; } catch { $("#maildraft").select(); } } }, "Copy the email")),
+    el("p", { class: "fineprint" }, "Attach your resume yourself in your email app before sending."));
+}

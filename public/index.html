@@ -93,6 +93,7 @@
 <div class="tabs" role="tablist">
 <button type="button" role="tab" data-tab="jobs" aria-selected="true">Matching jobs</button>
 <button type="button" role="tab" data-tab="improve" aria-selected="false">Improve resume</button>
+<button type="button" role="tab" data-tab="post" aria-selected="false">Check a job post</button>
 <button type="button" role="tab" data-tab="portals" aria-selected="false">More places to search</button>
 </div>
 
@@ -124,6 +125,15 @@
 <label class="f" for="summary" style="margin-top:14px">Profile summary</label><textarea id="summary"></textarea>
 <div id="rewrites" style="margin-top:16px"></div><h3>Next steps</h3><ul id="advice" style="margin:8px 0 18px 20px"></ul>
 <button type="button" class="btn" id="download">Download improved resume (Word)</button><p class="status" id="dlmsg" role="status"></p></div>
+</div>
+
+<div data-panel="post" hidden>
+<div class="two">
+<div class="panel"><h3>Paste a job post</h3><p>Saw an opening in a LinkedIn post, a WhatsApp group or an email? Paste its full text here to check it against your resume.</p>
+<label class="f" for="posttext" style="margin-top:14px">Post text</label><textarea id="posttext" placeholder="We're hiring | Data Analyst | Mumbai | 0 to 2 years | SQL and Python ..."></textarea>
+<p style="margin-top:12px"><button type="button" class="btn" id="postcheck">Check this post</button></p><p class="status" id="postmsg" role="status"></p></div>
+<div id="postout" hidden></div>
+</div>
 </div>
 
 <div data-panel="portals" hidden><div class="sec-head"><p>Each link opens a search already filled in with your role and city, on that site.</p></div><div class="links" id="portals"></div></div>
