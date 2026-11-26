@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-26T17:10:50.672Z",
+ "updated": "2026-11-26T21:18:50.719Z",
  "sources": [
   {
    "name": "Groww",
@@ -47,7 +47,7 @@
    "name": "Databricks",
    "ats": "greenhouse",
    "status": "ok",
-   "openings": 62
+   "openings": 63
   },
   {
    "name": "Cloudflare",
@@ -104,41 +104,6 @@
    "openings": 10
   },
   {
-   "name": "Thoughtworks",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "BrowserStack",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Chargebee",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Whatfix",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "MoEngage",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
    "name": "Observe.AI",
    "ats": "greenhouse",
    "status": "ok",
@@ -181,27 +146,6 @@
    "openings": 21
   },
   {
-   "name": "Dream Sports",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Games24x7",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "ShareChat",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
    "name": "Agoda",
    "ats": "greenhouse",
    "status": "ok",
@@ -232,108 +176,10 @@
    "openings": 17
   },
   {
-   "name": "Sprinklr",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Media.net",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Nutanix",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Freshworks",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Postman",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Zeta",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Uniphore",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Innovaccer",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "PhysicsWallah",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "upGrad",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Urban Company",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Swiggy",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Zomato",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
-   "name": "Ather Energy",
-   "ats": "greenhouse",
-   "status": "skip",
-   "openings": 0,
-   "error": "fetch failed"
-  },
-  {
    "name": "Meesho",
    "ats": "lever",
    "status": "ok",
-   "openings": 61
+   "openings": 60
   },
   {
    "name": "CRED",
@@ -348,101 +194,10 @@
    "openings": 191
   },
   {
-   "name": "smallcase",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "MPL",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Jupiter",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Navi",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "slice",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "BharatPe",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Spinny",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "CARS24",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "udaan",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Pine Labs",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Juspay",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
    "name": "Hevo Data",
    "ats": "lever",
    "status": "ok",
    "openings": 41
-  },
-  {
-   "name": "Atlan",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Plum",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
   },
   {
    "name": "FamPay",
@@ -451,66 +206,10 @@
    "openings": 13
   },
   {
-   "name": "Khatabook",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Zepto",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
    "name": "Pocket FM",
    "ats": "lever",
    "status": "ok",
    "openings": 2
-  },
-  {
-   "name": "Kuku FM",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Rupeek",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "ACKO",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "OfBusiness",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Licious",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Rapido",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
   },
   {
    "name": "Porter",
@@ -519,31 +218,10 @@
    "openings": 0
   },
   {
-   "name": "Delhivery",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Upstox",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
    "name": "Nium",
    "ats": "lever",
    "status": "ok",
    "openings": 15
-  },
-  {
-   "name": "LeadSquared",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
   },
   {
    "name": "Mindtickle",
@@ -552,290 +230,10 @@
    "openings": 16
   },
   {
-   "name": "Tekion",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "HighRadius",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "CleverTap",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Yellow.ai",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Gupshup",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Exotel",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Vedantu",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Scaler",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Eightfold",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Zoomcar",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Lenskart",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Purplle",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "SUGAR Cosmetics",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Wakefit",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "PharmEasy",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Practo",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "HealthifyMe",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Zetwerk",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Moglix",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Jumbotail",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Ninjacart",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "DeHaat",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Country Delight",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
    "name": "Fi Money",
    "ats": "lever",
    "status": "ok",
    "openings": 0
-  },
-  {
-   "name": "Uni Cards",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Dunzo",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Shiprocket",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Unacademy",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Rebel Foods",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Swiggy",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Nykaa",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Bounce",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Classplus",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Teachmint",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Groww",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "InsuranceDekho",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Mintifi",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Kissht",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "KreditBee",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Simpl",
-   "ats": "lever",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Rippling",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
   },
   {
    "name": "Deel",
@@ -868,13 +266,6 @@
    "openings": 0
   },
   {
-   "name": "Zepto",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
    "name": "Composio",
    "ats": "ashby",
    "status": "ok",
@@ -887,45 +278,10 @@
    "openings": 4
   },
   {
-   "name": "Jar",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Even Healthcare",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Rocket",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
-   "name": "Hasura",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
-  },
-  {
    "name": "SpotDraft",
    "ats": "ashby",
    "status": "ok",
    "openings": 7
-  },
-  {
-   "name": "Sprinto",
-   "ats": "ashby",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 404"
   },
   {
    "name": "Bosch",
@@ -985,7 +341,7 @@
    "name": "NielsenIQ",
    "ats": "smartrecruiters",
    "status": "ok",
-   "openings": 89
+   "openings": 85
   },
   {
    "name": "Equinix",
@@ -1034,6 +390,60 @@
    "ats": "smartrecruiters",
    "status": "ok",
    "openings": 0
+  },
+  {
+   "name": "Swiggy",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 149
+  },
+  {
+   "name": "Upstox",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
+  },
+  {
+   "name": "Lendingkart",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
+  },
+  {
+   "name": "Turtlemint",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
+  },
+  {
+   "name": "Unacademy",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 3
+  },
+  {
+   "name": "Newton School",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
+  },
+  {
+   "name": "Instahyre",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 3
+  },
+  {
+   "name": "CARS24",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
+  },
+  {
+   "name": "NoBroker",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
   },
   {
    "name": "Walmart",
@@ -1185,8 +595,9 @@
   {
    "name": "Philips",
    "ats": "workday",
-   "status": "ok",
-   "openings": 37
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "GE HealthCare",
@@ -1226,8 +637,9 @@
   {
    "name": "LSEG",
    "ats": "workday",
-   "status": "ok",
-   "openings": 14
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "CVS Health",
@@ -1269,7 +681,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Lowe's",
@@ -1293,6 +705,13 @@
   },
   {
    "name": "Genpact",
+   "ats": "workday",
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
+  },
+  {
+   "name": "Deutsche Bank",
    "ats": "workday",
    "status": "skip",
    "openings": 0,
