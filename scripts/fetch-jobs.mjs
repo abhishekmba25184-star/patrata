@@ -34,10 +34,20 @@ export function fromAshby(body, company) {
 const UA = { accept: "application/json", "accept-language": "en-US", "user-agent": "Mozilla/5.0 (compatible; PatrataJobsBot/1.0)" };
 const MAX_PER_COMPANY = 300;
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Waits and tries again when a site says "too many requests".
 async function getJson(url, init = {}) {
-  const r = await fetch(url, { ...init, signal: AbortSignal.timeout(30000), headers: { ...UA, ...(init.headers || {}) } });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
+  for (let attempt = 0; ; attempt++) {
+    const r = await fetch(url, { ...init, signal: AbortSignal.timeout(30000), headers: { ...UA, ...(init.headers || {}) } });
+    if (r.ok) return r.json();
+    if ((r.status === 429 || r.status === 503) && attempt < 4) {
+      const wait = Math.min(60, +r.headers.get("retry-after") || 5 * 2 ** attempt);
+      await sleep(wait * 1000);
+      continue;
+    }
+    throw new Error(`HTTP ${r.status}`);
+  }
 }
 
 // Runs fn over items, a few at a time.
@@ -96,6 +106,7 @@ export function fromWorkday(list, details, company, c) {
   });
 }
 
+const WORKDAY_MAX = 150;
 async function workday(c) {
   const api = `https://${c.host}/wday/cxs/${c.tenant}/${c.site}`;
   const post = body => getJson(`${api}/jobs`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
@@ -103,14 +114,15 @@ async function workday(c) {
   const india = indiaFacet(first.facets);
   const base = india ? { appliedFacets: { [india.param]: [india.id] }, searchText: "" } : { appliedFacets: {}, searchText: "India" };
   const list = [];
-  for (let offset = 0; list.length < MAX_PER_COMPANY; offset += 20) {
+  for (let offset = 0; list.length < WORKDAY_MAX; offset += 20) {
+    await sleep(400);
     const body = await post({ ...base, limit: 20, offset });
     const page = body.jobPostings || [];
     list.push(...page);
     if (page.length < 20 || offset + 20 >= (body.total || 0)) break;
   }
-  const trimmed = list.slice(0, MAX_PER_COMPANY);
-  const details = await pool(trimmed, 6, j => getJson(`${api}${j.externalPath}`));
+  const trimmed = list.slice(0, WORKDAY_MAX);
+  const details = await pool(trimmed, 2, async j => { await sleep(250); return getJson(`${api}${j.externalPath}`); });
   return fromWorkday(trimmed, details, c.name, c);
 }
 
@@ -140,7 +152,8 @@ async function main() {
   const { companies } = JSON.parse(await readFile(new URL("scripts/companies.json", root)));
   const previous = await readFile(new URL("public/data/jobs.json", root)).then(JSON.parse).catch(() => ({ jobs: [] }));
   const fresh = previous.updated && Date.now() - Date.parse(previous.updated) < 3 * 864e5;
-  const results = await pool(companies, 8, async c => {
+  // Workday sites share servers and limit request rates, so they go one at a time.
+  const collect = async c => {
     try {
       const found = (await fetchCompany(c)).filter(j => j.title && j.url && inIndia(`${j.location}; ${j.where}`)).slice(0, MAX_PER_COMPANY);
       return { c, status: "ok", jobs: found.map(j => normaliseJob({ ...j, location: inIndia(j.location) ? j.location : j.where })) };
@@ -148,7 +161,9 @@ async function main() {
       // Keep the last openings for a few days if one board is briefly down.
       return { c, status: "skip", error: e.message, jobs: fresh ? previous.jobs.filter(j => j.company === c.name) : [] };
     }
-  });
+  };
+  const [others, slow] = await Promise.all([pool(companies.filter(c => c.ats !== "workday"), 8, collect), pool(companies.filter(c => c.ats === "workday"), 1, collect)]);
+  const results = [...others, ...slow];
   const seen = new Set(), jobs = [];
   for (const r of results) for (const j of r.jobs) {
     const k = `${j.company}|${j.title}|${j.location}`.toLowerCase();

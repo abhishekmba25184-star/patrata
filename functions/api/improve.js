@@ -33,17 +33,26 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   const clip = (s, n) => String(s || "").slice(0, n).replace(/<\/?(resume|lines|job)>/gi, "");
   const prompt = `<resume>\n${clip(body.resume, 9000)}\n</resume>\n<lines>\n${body.bullets.slice(0, 18).map((b, i) => `${i}: ${clip(b, 300)}`).join("\n")}\n</lines>\n<job>\n${clip(body.job, 4000) || `Target roles: ${(body.roles || []).slice(0, 3).join(", ")}`}\n</job>`;
-  const model = env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+  // Tries the chosen model first, then current free models if Google says a model does not exist.
+  const models = [...new Set([env.GEMINI_MODEL, "gemini-4-hydrogen", "gemini-3.8-flash", "gemini-3.5-flash"].filter(Boolean))];
   let r;
-  try {
-    r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-      method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: RULES }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } })
-    });
-  } catch { return json({ error: "The AI service did not respond. Try again in a minute." }, 502); }
+  for (const model of models) {
+    try {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+        method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": String(env.GEMINI_API_KEY).trim() },
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: RULES }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } })
+      });
+    } catch { return json({ error: "The AI service did not respond. Try again in a minute." }, 502); }
+    if (r.status !== 404) break;
+    console.log("Gemini model not found", model);
+  }
   if (!r.ok) {
     console.log("Gemini error", r.status, (await r.text()).slice(0, 300));
-    return json({ error: r.status === 429 ? "The free AI limit is used up for now. Try again later." : "The AI service returned an error. Try again later." }, 502);
+    const why = r.status === 429 ? "The free AI limit is used up for now. Try again later."
+      : r.status === 401 || r.status === 403 ? "The AI key was not accepted by Google."
+      : r.status === 404 ? "The AI model name was not found."
+      : "The AI service returned an error. Try again later.";
+    return json({ error: `${why} (Google code ${r.status})` }, 502);
   }
   let out;
   try {

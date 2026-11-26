@@ -87,31 +87,6 @@
    "slug": "druva"
   },
   {
-   "name": "Thoughtworks",
-   "ats": "greenhouse",
-   "slug": "thoughtworks"
-  },
-  {
-   "name": "BrowserStack",
-   "ats": "greenhouse",
-   "slug": "browserstack"
-  },
-  {
-   "name": "Chargebee",
-   "ats": "greenhouse",
-   "slug": "chargebee"
-  },
-  {
-   "name": "Whatfix",
-   "ats": "greenhouse",
-   "slug": "whatfix"
-  },
-  {
-   "name": "MoEngage",
-   "ats": "greenhouse",
-   "slug": "moengage"
-  },
-  {
    "name": "Observe.AI",
    "ats": "greenhouse",
    "slug": "observeai"
@@ -147,21 +122,6 @@
    "slug": "toast"
   },
   {
-   "name": "Dream Sports",
-   "ats": "greenhouse",
-   "slug": "dreamsports"
-  },
-  {
-   "name": "Games24x7",
-   "ats": "greenhouse",
-   "slug": "games24x7"
-  },
-  {
-   "name": "ShareChat",
-   "ats": "greenhouse",
-   "slug": "sharechat"
-  },
-  {
    "name": "Agoda",
    "ats": "greenhouse",
    "slug": "agoda"
@@ -187,76 +147,6 @@
    "slug": "gleanwork"
   },
   {
-   "name": "Sprinklr",
-   "ats": "greenhouse",
-   "slug": "sprinklr"
-  },
-  {
-   "name": "Media.net",
-   "ats": "greenhouse",
-   "slug": "medianet"
-  },
-  {
-   "name": "Nutanix",
-   "ats": "greenhouse",
-   "slug": "nutanix"
-  },
-  {
-   "name": "Freshworks",
-   "ats": "greenhouse",
-   "slug": "freshworks"
-  },
-  {
-   "name": "Postman",
-   "ats": "greenhouse",
-   "slug": "postman"
-  },
-  {
-   "name": "Zeta",
-   "ats": "greenhouse",
-   "slug": "zeta"
-  },
-  {
-   "name": "Uniphore",
-   "ats": "greenhouse",
-   "slug": "uniphore"
-  },
-  {
-   "name": "Innovaccer",
-   "ats": "greenhouse",
-   "slug": "innovaccer"
-  },
-  {
-   "name": "PhysicsWallah",
-   "ats": "greenhouse",
-   "slug": "physicswallah"
-  },
-  {
-   "name": "upGrad",
-   "ats": "greenhouse",
-   "slug": "upgrad"
-  },
-  {
-   "name": "Urban Company",
-   "ats": "greenhouse",
-   "slug": "urbancompany"
-  },
-  {
-   "name": "Swiggy",
-   "ats": "greenhouse",
-   "slug": "swiggy"
-  },
-  {
-   "name": "Zomato",
-   "ats": "greenhouse",
-   "slug": "zomato"
-  },
-  {
-   "name": "Ather Energy",
-   "ats": "greenhouse",
-   "slug": "atherenergy"
-  },
-  {
    "name": "Meesho",
    "ats": "lever",
    "slug": "meesho"
@@ -272,74 +162,9 @@
    "slug": "paytm"
   },
   {
-   "name": "smallcase",
-   "ats": "lever",
-   "slug": "smallcase"
-  },
-  {
-   "name": "MPL",
-   "ats": "lever",
-   "slug": "mpl"
-  },
-  {
-   "name": "Jupiter",
-   "ats": "lever",
-   "slug": "jupiter"
-  },
-  {
-   "name": "Navi",
-   "ats": "lever",
-   "slug": "navi"
-  },
-  {
-   "name": "slice",
-   "ats": "lever",
-   "slug": "sliceit"
-  },
-  {
-   "name": "BharatPe",
-   "ats": "lever",
-   "slug": "bharatpe"
-  },
-  {
-   "name": "Spinny",
-   "ats": "lever",
-   "slug": "spinny"
-  },
-  {
-   "name": "CARS24",
-   "ats": "lever",
-   "slug": "cars24"
-  },
-  {
-   "name": "udaan",
-   "ats": "lever",
-   "slug": "udaan"
-  },
-  {
-   "name": "Pine Labs",
-   "ats": "lever",
-   "slug": "pinelabs"
-  },
-  {
-   "name": "Juspay",
-   "ats": "lever",
-   "slug": "juspay"
-  },
-  {
    "name": "Hevo Data",
    "ats": "lever",
    "slug": "hevodata"
-  },
-  {
-   "name": "Atlan",
-   "ats": "lever",
-   "slug": "atlan"
-  },
-  {
-   "name": "Plum",
-   "ats": "lever",
-   "slug": "plum"
   },
   {
    "name": "FamPay",
@@ -347,49 +172,9 @@
    "slug": "fampay"
   },
   {
-   "name": "Khatabook",
-   "ats": "lever",
-   "slug": "khatabook"
-  },
-  {
-   "name": "Zepto",
-   "ats": "lever",
-   "slug": "zeptonow"
-  },
-  {
    "name": "Pocket FM",
    "ats": "lever",
    "slug": "pocketfm"
-  },
-  {
-   "name": "Kuku FM",
-   "ats": "lever",
-   "slug": "kukufm"
-  },
-  {
-   "name": "Rupeek",
-   "ats": "lever",
-   "slug": "rupeek"
-  },
-  {
-   "name": "ACKO",
-   "ats": "lever",
-   "slug": "acko"
-  },
-  {
-   "name": "OfBusiness",
-   "ats": "lever",
-   "slug": "ofbusiness"
-  },
-  {
-   "name": "Licious",
-   "ats": "lever",
-   "slug": "licious"
-  },
-  {
-   "name": "Rapido",
-   "ats": "lever",
-   "slug": "rapido"
   },
   {
    "name": "Porter",
@@ -397,24 +182,9 @@
    "slug": "porter"
   },
   {
-   "name": "Delhivery",
-   "ats": "lever",
-   "slug": "delhivery"
-  },
-  {
-   "name": "Upstox",
-   "ats": "lever",
-   "slug": "upstox"
-  },
-  {
    "name": "Nium",
    "ats": "lever",
    "slug": "nium"
-  },
-  {
-   "name": "LeadSquared",
-   "ats": "lever",
-   "slug": "leadsquared"
   },
   {
    "name": "Mindtickle",
@@ -422,209 +192,9 @@
    "slug": "mindtickle"
   },
   {
-   "name": "Tekion",
-   "ats": "lever",
-   "slug": "tekion"
-  },
-  {
-   "name": "HighRadius",
-   "ats": "lever",
-   "slug": "highradius"
-  },
-  {
-   "name": "CleverTap",
-   "ats": "lever",
-   "slug": "clevertap"
-  },
-  {
-   "name": "Yellow.ai",
-   "ats": "lever",
-   "slug": "yellowai"
-  },
-  {
-   "name": "Gupshup",
-   "ats": "lever",
-   "slug": "gupshup"
-  },
-  {
-   "name": "Exotel",
-   "ats": "lever",
-   "slug": "exotel"
-  },
-  {
-   "name": "Vedantu",
-   "ats": "lever",
-   "slug": "vedantu"
-  },
-  {
-   "name": "Scaler",
-   "ats": "lever",
-   "slug": "scaler"
-  },
-  {
-   "name": "Eightfold",
-   "ats": "lever",
-   "slug": "eightfold"
-  },
-  {
-   "name": "Zoomcar",
-   "ats": "lever",
-   "slug": "zoomcar"
-  },
-  {
-   "name": "Lenskart",
-   "ats": "lever",
-   "slug": "lenskart"
-  },
-  {
-   "name": "Purplle",
-   "ats": "lever",
-   "slug": "purplle"
-  },
-  {
-   "name": "SUGAR Cosmetics",
-   "ats": "lever",
-   "slug": "sugarcosmetics"
-  },
-  {
-   "name": "Wakefit",
-   "ats": "lever",
-   "slug": "wakefit"
-  },
-  {
-   "name": "PharmEasy",
-   "ats": "lever",
-   "slug": "pharmeasy"
-  },
-  {
-   "name": "Practo",
-   "ats": "lever",
-   "slug": "practo"
-  },
-  {
-   "name": "HealthifyMe",
-   "ats": "lever",
-   "slug": "healthifyme"
-  },
-  {
-   "name": "Zetwerk",
-   "ats": "lever",
-   "slug": "zetwerk"
-  },
-  {
-   "name": "Moglix",
-   "ats": "lever",
-   "slug": "moglix"
-  },
-  {
-   "name": "Jumbotail",
-   "ats": "lever",
-   "slug": "jumbotail"
-  },
-  {
-   "name": "Ninjacart",
-   "ats": "lever",
-   "slug": "ninjacart"
-  },
-  {
-   "name": "DeHaat",
-   "ats": "lever",
-   "slug": "dehaat"
-  },
-  {
-   "name": "Country Delight",
-   "ats": "lever",
-   "slug": "countrydelight"
-  },
-  {
    "name": "Fi Money",
    "ats": "lever",
    "slug": "epifi"
-  },
-  {
-   "name": "Uni Cards",
-   "ats": "lever",
-   "slug": "uni"
-  },
-  {
-   "name": "Dunzo",
-   "ats": "lever",
-   "slug": "dunzo"
-  },
-  {
-   "name": "Shiprocket",
-   "ats": "lever",
-   "slug": "shiprocket"
-  },
-  {
-   "name": "Unacademy",
-   "ats": "lever",
-   "slug": "unacademy"
-  },
-  {
-   "name": "Rebel Foods",
-   "ats": "lever",
-   "slug": "rebelfoods"
-  },
-  {
-   "name": "Swiggy",
-   "ats": "lever",
-   "slug": "swiggy"
-  },
-  {
-   "name": "Nykaa",
-   "ats": "lever",
-   "slug": "nykaa"
-  },
-  {
-   "name": "Bounce",
-   "ats": "lever",
-   "slug": "bounce"
-  },
-  {
-   "name": "Classplus",
-   "ats": "lever",
-   "slug": "classplus"
-  },
-  {
-   "name": "Teachmint",
-   "ats": "lever",
-   "slug": "teachmint"
-  },
-  {
-   "name": "Groww",
-   "ats": "lever",
-   "slug": "groww"
-  },
-  {
-   "name": "InsuranceDekho",
-   "ats": "lever",
-   "slug": "insurancedekho"
-  },
-  {
-   "name": "Mintifi",
-   "ats": "lever",
-   "slug": "mintifi"
-  },
-  {
-   "name": "Kissht",
-   "ats": "lever",
-   "slug": "kissht"
-  },
-  {
-   "name": "KreditBee",
-   "ats": "lever",
-   "slug": "kreditbee"
-  },
-  {
-   "name": "Simpl",
-   "ats": "lever",
-   "slug": "simpl"
-  },
-  {
-   "name": "Rippling",
-   "ats": "ashby",
-   "slug": "rippling"
   },
   {
    "name": "Deel",
@@ -652,11 +222,6 @@
    "slug": "cohere"
   },
   {
-   "name": "Zepto",
-   "ats": "ashby",
-   "slug": "zepto"
-  },
-  {
    "name": "Composio",
    "ats": "ashby",
    "slug": "composio"
@@ -667,34 +232,9 @@
    "slug": "atlan"
   },
   {
-   "name": "Jar",
-   "ats": "ashby",
-   "slug": "jar"
-  },
-  {
-   "name": "Even Healthcare",
-   "ats": "ashby",
-   "slug": "even"
-  },
-  {
-   "name": "Rocket",
-   "ats": "ashby",
-   "slug": "rocket"
-  },
-  {
-   "name": "Hasura",
-   "ats": "ashby",
-   "slug": "hasura"
-  },
-  {
    "name": "SpotDraft",
    "ats": "ashby",
    "slug": "spotdraft"
-  },
-  {
-   "name": "Sprinto",
-   "ats": "ashby",
-   "slug": "sprinto"
   },
   {
    "name": "Bosch",
