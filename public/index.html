@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Patrata: Match your resume to jobs and check eligibility | Freshers India</title>
+<meta name="description" content="Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.">
+<link rel="canonical" href="https://patrata.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_IN">
+<meta property="og:site_name" content="Patrata">
+<meta property="og:title" content="Patrata: Match your resume to jobs and check eligibility | Freshers India">
+<meta property="og:description" content="Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.">
+<meta property="og:url" content="https://patrata.pages.dev/">
+<meta property="og:image" content="https://patrata.pages.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2f655c">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Patrata","url":"https://patrata.pages.dev","logo":"https://patrata.pages.dev/favicon.svg","email":"hello@example.com"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Patrata","url":"https://patrata.pages.dev","inLanguage":"en-IN"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Patrata","url":"https://patrata.pages.dev","applicationCategory":"BusinessApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+<a class="logo" href="/"><span class="mark" aria-hidden="true"></span>Patrata</a>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a><a href="/guides/">Guides</a></nav>
+</div></header>
+<main id="main">
+<section class="hero" id="start"><div class="wrap">
+<div>
+<h1>Find the jobs your resume is eligible for</h1>
+<p class="lead">Upload your resume. See openings across India that fit it, which conditions you meet for each one, and what to fix before you apply.</p>
+<div class="drop" id="drop">
+<h2>Start with your resume</h2>
+<p>Drop a PDF or Word file here. It is read on your device and is not stored.</p>
+<label class="consent"><input type="checkbox" id="agree"><span>I am 18 or older and I agree to the <a href="/terms/">terms</a> and <a href="/privacy/">privacy notice</a>.</span></label>
+<div class="row"><button type="button" class="btn" id="pick">Choose resume file</button><button type="button" class="btn alt" id="showpaste">Paste text instead</button></div>
+<input type="file" id="file" accept=".pdf,.docx,.txt" hidden>
+<div id="pastebox" hidden style="margin-top:14px"><label class="f" for="paste">Resume text</label><textarea id="paste"></textarea><button type="button" class="btn" id="usepaste" style="margin-top:10px">Read this text</button></div>
+<p class="status" id="status" role="status"></p>
+</div>
+</div>
+<div class="slip" aria-label="Example of an eligibility check">
+<header><h2>Management Trainee, Finance</h2><span class="stamp check">Check criteria</span></header>
+<div class="body">
+<p>An example of what you see for each opening.</p>
+<ul class="checks">
+<li class="pass"><span class="tick" aria-label="met"></span><b>Batch</b><span>Meant for 2027. Yours is 2027.</span></li>
+<li class="pass"><span class="tick" aria-label="met"></span><b>Degree</b><span>MBA or PGDM. You have it.</span></li>
+<li class="pass"><span class="tick" aria-label="met"></span><b>Experience</b><span>Open to freshers.</span></li>
+<li class="check"><span class="tick" aria-label="please check"></span><b>CGPA</b><span>Asks for 7.0 or higher. Add yours to confirm.</span></li>
+</ul>
+<div class="chips" style="margin-top:14px"><span class="chip have">✓ Excel</span><span class="chip have">✓ Valuation</span><span class="chip miss">Not on resume: Power BI</span></div>
+</div>
+</div>
+</div></section>
+
+<div id="workspace" hidden>
+<section class="band"><div class="wrap">
+<div class="sec-head"><h2>Check what we read</h2><p>Correct anything that is wrong. Eligibility depends on these details.</p></div>
+<div class="panel"><div class="formgrid">
+<div><label class="f" for="p-year">Graduation year</label><input type="number" id="p-year" min="2000" max="2035"></div>
+<div><label class="f" for="p-exp">Full-time experience (years)</label><input type="number" id="p-exp" min="0" max="40" step="0.5"></div>
+<div><label class="f" for="p-cgpa">CGPA out of 10</label><input type="number" id="p-cgpa" min="0" max="10" step="0.01"></div>
+<div><label class="f" for="p-city">Preferred city</label><select id="p-city"><option value="">Anywhere in India</option></select></div>
+<div class="full"><span class="f"><b>Degrees, completed or in progress</b></span><div class="chips" id="p-degrees"></div></div>
+<div class="full"><span class="f"><b>Kinds of role you want</b></span><div class="chips" id="p-roles"></div></div>
+<div class="full"><span class="f"><b>Skills found. Select one to remove it.</b></span><div class="chips" id="p-skills"></div>
+<form class="addrow" id="addskill"><input type="text" id="newskill" list="skilllist" placeholder="Add a skill" aria-label="Add a skill"><datalist id="skilllist"></datalist><button class="btn alt small">Add</button></form></div>
+</div>
+<p style="margin-top:22px"><button type="button" class="btn" id="find">Show my matching jobs</button></p>
+<p class="status err" id="findmsg" role="status"></p>
+</div>
+</div></section>
+
+<section class="band" id="output" hidden><div class="wrap">
+<div class="tabs" role="tablist">
+<button type="button" role="tab" data-tab="jobs" aria-selected="true">Matching jobs</button>
+<button type="button" role="tab" data-tab="improve" aria-selected="false">Improve resume</button>
+<button type="button" role="tab" data-tab="portals" aria-selected="false">More places to search</button>
+</div>
+
+<div data-panel="jobs">
+<div class="notice" id="samplenote" hidden><strong>These are example listings, not real openings.</strong> Live job data has not been loaded on this site yet. Use "More places to search" for real openings.</div>
+<div class="count" id="counts"></div>
+<p id="freshness" style="margin-bottom:14px"></p>
+<div class="results">
+<aside class="filters" aria-label="Filter jobs">
+<div><label class="f" for="f-q">Role or company</label><input type="search" id="f-q"></div>
+<div><label class="f" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select></div>
+<div><label class="f" for="f-type">Type</label><select id="f-type"><option value="">Jobs and internships</option><option value="intern">Internships</option><option value="job">Jobs</option></select></div>
+<div id="unlockbox"><h3>Skills that come up</h3><p>Asked in your matches but not on your resume.</p><ul id="unlocks" style="margin:8px 0 0 18px"></ul></div>
+</aside>
+<div><div id="list" aria-live="polite"></div><button type="button" class="btn alt" id="more" hidden>Show more jobs</button></div>
+</div>
+</div>
+
+<div data-panel="improve" hidden>
+<div class="two">
+<div class="panel"><h3>Your resume score</h3><p><span class="score" id="score">0</span> out of 100</p><ul class="bars" id="scorebars"></ul></div>
+<div class="panel"><h3>Tailor to a job</h3><label class="f" for="jd" style="margin-top:12px">Job description</label><textarea id="jd" placeholder="Paste a job description here"></textarea><p id="jdnote"></p><div id="gap"></div>
+<h3 style="margin-top:22px">Rewrite with AI</h3>
+<label class="consent"><input type="checkbox" id="aiagree"><span>Send my resume text to Google's Gemini AI. Contact details and name are removed where detected. Google may store, review and use this text to improve its services. <a href="/privacy/">Details</a></span></label>
+<p style="margin-top:14px"><button type="button" class="btn" id="ai">Rewrite my resume points</button></p><p class="status" id="aimsg" role="status"></p></div>
+</div>
+<div class="panel" id="aiout" hidden style="margin-top:24px"><h3>Review the suggestions</h3><p>Edit freely. Keep only what is true.</p>
+<label class="f" for="summary" style="margin-top:14px">Profile summary</label><textarea id="summary"></textarea>
+<div id="rewrites" style="margin-top:16px"></div><h3>Next steps</h3><ul id="advice" style="margin:8px 0 18px 20px"></ul>
+<button type="button" class="btn" id="download">Download improved resume (Word)</button><p class="status" id="dlmsg" role="status"></p></div>
+</div>
+
+<div data-panel="portals" hidden><div class="sec-head"><p>Each link opens a search already filled in with your role and city, on that site.</p></div><div class="links" id="portals"></div></div>
+</div></section>
+</div>
+
+<section class="band"><div class="wrap">
+<div class="sec-head"><h2>From resume to application</h2></div>
+<ol class="steps">
+<li><h3>Upload</h3><p>Add your resume as a PDF or Word file.</p></li>
+<li><h3>Confirm</h3><p>Check the degree, batch, experience and skills we read.</p></li>
+<li><h3>Compare</h3><p>See each opening marked eligible, to be checked, or not yet eligible, with the reason.</p></li>
+<li><h3>Improve and apply</h3><p>Tailor your resume, then apply on the source site.</p></li>
+</ol>
+</div></section>
+
+<section class="band white"><div class="wrap">
+<div class="sec-head"><h2>Browse jobs by role</h2></div>
+<ul class="dir"><li><a href="/jobs/software-developer-jobs/">Software Development jobs</a></li><li><a href="/jobs/data-analyst-jobs/">Data and Analytics jobs</a></li><li><a href="/jobs/finance-jobs/">Finance jobs</a></li><li><a href="/jobs/marketing-jobs/">Marketing jobs</a></li><li><a href="/jobs/business-development-jobs/">Sales and Business Development jobs</a></li><li><a href="/jobs/product-management-jobs/">Product jobs</a></li><li><a href="/jobs/business-analyst-jobs/">Strategy and Consulting jobs</a></li><li><a href="/jobs/operations-jobs/">Operations and Supply Chain jobs</a></li><li><a href="/jobs/human-resources-jobs/">Human Resources jobs</a></li><li><a href="/jobs/ui-ux-design-jobs/">Design jobs</a></li></ul>
+</div></section>
+
+<section class="band"><div class="wrap faq">
+<div class="sec-head"><h2>Questions students ask</h2></div>
+<details><summary>Is it free for students?</summary><p>Yes. Uploading a resume, seeing matched jobs, the eligibility check and the resume score are free. The AI rewrite has a daily limit.</p></details>
+<details><summary>Do you store my resume?</summary><p>No. Your file is read inside your browser. If you ask for an AI rewrite, the text is sent to the AI service after email, phone number, links and name are removed as far as the software can detect them.</p></details>
+<details><summary>Do you show jobs from LinkedIn and Naukri?</summary><p>Matched openings come from company career pages and, where live search is switched on, from Google for Jobs listings that may point to large job sites. We also give you ready-made searches that open on LinkedIn, Naukri, Indeed and others.</p></details>
+<details><summary>How is eligibility decided?</summary><p>The site reads experience, batch year, degree and CGPA requirements from the job text and compares them with your profile. It can miss or misread a condition, so always read the full post before applying.</p></details>
+<details><summary>Will this guarantee me a job?</summary><p>No. It helps you find suitable openings and present your real experience well. Employers make every hiring decision.</p></details>
+</div></section>
+
+</main>
+<footer><div class="wrap">
+<div class="cols">
+<div><h2>Patrata</h2><p>Resume-based job matching for students and freshers across India. Applications happen on the employer's or job site's own page.</p></div>
+<div><h2>Jobs by role</h2><ul><li><a href="/jobs/software-developer-jobs/">software developer jobs</a></li><li><a href="/jobs/data-analyst-jobs/">data analyst jobs</a></li><li><a href="/jobs/finance-jobs/">finance jobs</a></li><li><a href="/jobs/marketing-jobs/">marketing jobs</a></li><li><a href="/jobs/business-development-jobs/">business development jobs</a></li><li><a href="/jobs/product-management-jobs/">product management jobs</a></li></ul></div>
+<div><h2>Guides</h2><ul><li><a href="/guides/ats-resume-for-freshers/">ATS resume for freshers</a></li><li><a href="/guides/mba-fresher-resume/">MBA fresher resume</a></li><li><a href="/guides/off-campus-job-search/">Off-campus job search</a></li><li><a href="/guides/avoid-fake-job-offers/">How to spot fake job offers</a></li></ul></div>
+<div><h2>About</h2><ul><li><a href="/about/">About us</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms of use</a></li><li><a href="mailto:hello@example.com">Contact</a></li></ul></div>
+</div>
+<p class="fine">Patrata is not affiliated with LinkedIn, Naukri or any employer listed. Never pay anyone to apply for a job.</p>
+</div></footer>
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>

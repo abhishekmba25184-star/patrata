@@ -1,0 +1,13 @@
+{
+  "note": "Official public career boards. ats is greenhouse, lever or ashby. slug is the last part of the company's job board address.",
+  "companies": [
+    { "name": "Groww", "ats": "greenhouse", "slug": "groww" },
+    { "name": "Razorpay", "ats": "greenhouse", "slug": "razorpaysoftwareprivatelimited" },
+    { "name": "InMobi", "ats": "greenhouse", "slug": "inmobi" },
+    { "name": "Capco", "ats": "greenhouse", "slug": "capco" },
+    { "name": "Emergent", "ats": "greenhouse", "slug": "emergentlabsinc" },
+    { "name": "Meesho", "ats": "lever", "slug": "meesho" },
+    { "name": "CRED", "ats": "lever", "slug": "cred" },
+    { "name": "Paytm", "ats": "lever", "slug": "paytm" }
+  ]
+}

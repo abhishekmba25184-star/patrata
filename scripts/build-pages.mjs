@@ -1,0 +1,178 @@
+// Writes every HTML page, the sitemap and robots.txt. Run: node scripts/build-pages.mjs
+import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
+import { ROLE_PAGES, GUIDES, FAQ } from "./content.mjs";
+
+const root = new URL("../", import.meta.url);
+const cfg = JSON.parse(await readFile(new URL("site.config.json", root)));
+const data = JSON.parse(await readFile(new URL("public/data/jobs.json", root)));
+const home = await readFile(new URL("scripts/home.html", root), "utf8");
+const BASE = cfg.url.replace(/\/$/, "");
+const CITY_PAGES = ["Bengaluru", "Mumbai", "Delhi NCR", "Hyderabad", "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur"];
+const MIN_CITY_JOBS = 5;
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const ld = o => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
+const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const pages = [];
+
+function layout({ path, title, desc, body, schema = [], index = true, script = "" }) {
+  const url = BASE + path;
+  return `<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
+${index ? "" : '<meta name="robots" content="noindex,follow">\n'}<link rel="canonical" href="${url}">
+${cfg.googleVerification ? `<meta name="google-site-verification" content="${esc(cfg.googleVerification)}">\n` : ""}<meta property="og:type" content="website">
+<meta property="og:locale" content="en_IN">
+<meta property="og:site_name" content="${esc(cfg.name)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${BASE}/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2f655c">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+${schema.map(ld).join("\n")}
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+<a class="logo" href="/"><span class="mark" aria-hidden="true"></span>${esc(cfg.name)}</a>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a><a href="/guides/">Guides</a></nav>
+</div></header>
+<main id="main">
+${body}
+</main>
+<footer><div class="wrap">
+<div class="cols">
+<div><h2>${esc(cfg.name)}</h2><p>Resume-based job matching for students and freshers across India. Applications happen on the employer's or job site's own page.</p></div>
+<div><h2>Jobs by role</h2><ul>${Object.values(ROLE_PAGES).slice(0, 6).map(r => `<li><a href="/jobs/${r.slug}-jobs/">${esc(r.slug.replace(/-/g, " "))} jobs</a></li>`).join("")}</ul></div>
+<div><h2>Guides</h2><ul>${GUIDES.map(g => `<li><a href="/guides/${g.slug}/">${esc(g.title.split(":")[0])}</a></li>`).join("")}</ul></div>
+<div><h2>About</h2><ul><li><a href="/about/">About us</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms of use</a></li><li><a href="mailto:${esc(cfg.email)}">Contact</a></li></ul></div>
+</div>
+<p class="fine">${esc(cfg.name)} is not affiliated with LinkedIn, Naukri or any employer listed. Never pay anyone to apply for a job.</p>
+</div></footer>
+${script}
+</body>
+</html>
+`;
+}
+
+async function write(path, opts) {
+  const file = path.endsWith("/") ? `public${path}index.html` : `public${path}`;
+  await mkdir(new URL(file.replace(/[^/]+$/, ""), root), { recursive: true });
+  await writeFile(new URL(file, root), layout({ path, ...opts }));
+  if (opts.index !== false) pages.push(path);
+}
+const crumbs = list => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [["Home", "/"], ...list].map(([name, p], i) => ({ "@type": "ListItem", position: i + 1, name, item: BASE + p })) });
+const trail = list => `<p class="crumbs"><a href="/">Home</a>${list.map(([n, p], i) => (i === list.length - 1 ? ` / ${esc(n)}` : ` / <a href="${p}">${esc(n)}</a>`)).join("")}</p>`;
+const cta = `<p><a class="btn" href="/#start">Check which jobs I am eligible for</a></p>`;
+
+// Home
+const faqHtml = FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
+await write("/", {
+  title: `${cfg.name}: Match your resume to jobs and check eligibility | Freshers India`,
+  desc: "Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.",
+  body: home.replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
+  schema: [
+    { "@context": "https://schema.org", "@type": "Organization", name: cfg.name, url: BASE, logo: `${BASE}/favicon.svg`, email: cfg.email },
+    { "@context": "https://schema.org", "@type": "WebSite", name: cfg.name, url: BASE, inLanguage: "en-IN" },
+    { "@context": "https://schema.org", "@type": "WebApplication", name: cfg.name, url: BASE, applicationCategory: "BusinessApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "INR" } }
+  ],
+  script: '<script type="module" src="/js/app.js"></script>'
+});
+
+// Role and city pages
+await rm(new URL("public/jobs/", root), { recursive: true, force: true });
+const fresherFirst = (a, b) => (a.criteria.minExp ?? 1.5) - (b.criteria.minExp ?? 1.5) || String(b.posted).localeCompare(String(a.posted));
+const isSenior = j => /\b(senior|sr\.?|lead|head|director|principal|staff|vp|vice president)\b/i.test(j.title) || (j.criteria.minExp ?? 0) > 3;
+const updated = data.updated ? new Date(data.updated).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" }) : null;
+const jobTable = jobs => `<div style="overflow-x:auto"><table><thead><tr><th>Role</th><th>Company</th><th>Location</th><th>Experience asked</th></tr></thead><tbody>${jobs.map(j => `<tr><td><a href="${esc(/^https?:/.test(j.url) ? j.url : "#")}" rel="nofollow noopener" target="_blank">${esc(j.title)}</a></td><td>${esc(j.company)}</td><td>${esc(j.location)}</td><td>${j.criteria.internship ? "Internship" : j.criteria.minExp === null ? "Not stated" : `${j.criteria.minExp}+ years`}</td></tr>`).join("")}</tbody></table></div>`;
+const topSkills = jobs => { const m = new Map(); jobs.forEach(j => j.skills.forEach(s => m.set(s, (m.get(s) || 0) + 1))); return [...m].sort((a, b) => b[1] - a[1]).slice(0, 8); };
+const hub = [];
+
+for (const [role, r] of Object.entries(ROLE_PAGES)) {
+  const all = data.jobs.filter(j => j.roles.includes(role) && !isSenior(j)).sort(fresherFirst);
+  const cityLinks = [];
+  for (const city of CITY_PAGES) {
+    const jobs = all.filter(j => j.cities.includes(city));
+    if (jobs.length < MIN_CITY_JOBS) continue; // no thin pages
+    const path = `/jobs/${r.slug}-jobs-in-${slugify(city)}/`;
+    cityLinks.push([city, path, jobs.length]);
+    const skills = topSkills(jobs), companies = [...new Set(jobs.map(j => j.company))];
+    const list = [["Jobs by role", "/jobs/"], [role, `/jobs/${r.slug}-jobs/`], [city, path]];
+    await write(path, {
+      title: `${role} jobs in ${city} for freshers and early careers | ${cfg.name}`,
+      desc: `${jobs.length} ${role.toLowerCase()} openings in ${city} from ${companies.length} employers, with experience asked and common skills. Updated ${updated}.`,
+      schema: [crumbs(list)],
+      body: `<div class="wrap article" style="max-width:960px">${trail(list)}<h1>${esc(role)} jobs in ${esc(city)}</h1>
+<p>${jobs.length} openings outside senior grades were listed on ${esc(updated)}, from ${esc(companies.join(", "))}.${skills.length ? ` Skills named most often: ${esc(skills.map(([s, n]) => `${s} (${n})`).join(", "))}.` : ""}</p>${cta}
+<h2>Current openings</h2>${jobTable(jobs.slice(0, 40))}
+<h2>Who should apply</h2><p>${esc(r.who)}</p><p><a href="/jobs/${r.slug}-jobs/">How to prepare for ${esc(role.toLowerCase())} roles</a></p></div>`
+    });
+  }
+  const path = `/jobs/${r.slug}-jobs/`;
+  const skills = topSkills(all);
+  hub.push([role, path, all.length]);
+  const list = [["Jobs by role", "/jobs/"], [role, path]];
+  await write(path, {
+    title: `${r.h} in India | ${cfg.name}`,
+    desc: `${r.intro.split(". ")[0]}. See eligibility, skills to show, interview preparation and current openings.`,
+    schema: [crumbs(list)],
+    body: `<div class="wrap article" style="max-width:960px">${trail(list)}<h1>${esc(r.h)}</h1><p>${esc(r.intro)}</p>${cta}
+<h2>Who is eligible</h2><p>${esc(r.who)}</p>
+<h2>What your resume should show</h2><ul>${r.prove.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+<h2>Interview preparation</h2><p>${esc(r.interview)}</p>
+${skills.length ? `<h2>Skills employers are naming now</h2><p>Counted across ${all.length} current openings: ${esc(skills.map(([s, n]) => `${s} (${n})`).join(", "))}.</p>` : ""}
+${cityLinks.length ? `<h2>Openings by city</h2><ul>${cityLinks.map(([c, p, n]) => `<li><a href="${p}">${esc(role)} jobs in ${esc(c)}</a>: ${n} openings</li>`).join("")}</ul>` : ""}
+<h2>Current openings</h2>${all.length ? `<p>Updated ${esc(updated)}.</p>${jobTable(all.slice(0, 30))}` : "<p>No openings are listed from tracked career pages right now. Upload your resume to get ready-made searches on other job sites.</p>"}</div>`
+  });
+}
+await write("/jobs/", {
+  title: `Fresher jobs by role in India | ${cfg.name}`, desc: "Browse fresher and early career openings in India by role: software, data, finance, marketing, sales, product, consulting, operations, HR and design.",
+  schema: [crumbs([["Jobs by role", "/jobs/"]])],
+  body: `<div class="wrap article">${trail([["Jobs by role", "/jobs/"]])}<h1>Fresher jobs by role</h1><p>Pick a role to see who is eligible, what to show on your resume and which openings are listed now.</p><ul>${hub.map(([r, p, n]) => `<li><a href="${p}">${esc(r)} jobs</a>${n ? `: ${n} listed` : ""}</li>`).join("")}</ul>${cta}</div>`
+});
+
+// Guides
+for (const g of GUIDES) {
+  const list = [["Guides", "/guides/"], [g.title.split(":")[0], `/guides/${g.slug}/`]];
+  await write(`/guides/${g.slug}/`, { title: `${g.title} | ${cfg.name}`, desc: g.desc,
+    schema: [crumbs(list), { "@context": "https://schema.org", "@type": "Article", headline: g.title, description: g.desc, inLanguage: "en-IN", author: { "@type": "Organization", name: cfg.name }, publisher: { "@type": "Organization", name: cfg.name }, image: `${BASE}/og.png`, mainEntityOfPage: `${BASE}/guides/${g.slug}/` }],
+    body: `<article class="wrap article">${trail(list)}<h1>${esc(g.title)}</h1>${g.body}${cta}</article>` });
+}
+await write("/guides/", { title: `Resume and job search guides for students | ${cfg.name}`, desc: "Practical guides on ATS resumes, MBA fresher resumes, off-campus job search and avoiding fake job offers.",
+  body: `<div class="wrap article"><h1>Guides for students</h1>${GUIDES.map(g => `<h2><a href="/guides/${g.slug}/">${esc(g.title)}</a></h2><p>${esc(g.desc)}</p>`).join("")}</div>` });
+
+await write("/resume-checker/", { title: `Free resume checker for freshers in India (ATS friendly) | ${cfg.name}`, desc: "Check your resume for free: contact details, sections, measurable results, action verbs, length and job keyword gaps. The check runs in your browser.",
+  schema: [crumbs([["Resume checker", "/resume-checker/"]])],
+  body: `<div class="wrap article"><h1>Free resume checker for freshers</h1><p>Upload your resume on the home page and open the Improve resume tab. The score is calculated in your browser and the file is not uploaded.</p><p><a class="btn" href="/#start">Check my resume</a></p>
+<h2>What the score looks at</h2><table><thead><tr><th>Check</th><th>Points</th><th>What earns them</th></tr></thead><tbody>
+<tr><td>Results with numbers</td><td>25</td><td>Most experience points show scale or outcome</td></tr><tr><td>Standard sections</td><td>20</td><td>Education, experience, projects and skills under plain headings</td></tr><tr><td>Strong opening verbs</td><td>20</td><td>Points begin with what you did</td></tr><tr><td>Contact details</td><td>10</td><td>Email and mobile number</td></tr><tr><td>Clear wording</td><td>10</td><td>No "responsible for" or "worked on"</td></tr><tr><td>Skills listed</td><td>10</td><td>Recognisable tools and methods</td></tr><tr><td>Length</td><td>5</td><td>About one page</td></tr></tbody></table>
+<p>The score is a writing and structure guide. It is not the score of any employer's software, and a high number does not guarantee a shortlist.</p><p>Read the <a href="/guides/ats-resume-for-freshers/">ATS resume guide for freshers</a>.</p></div>` });
+
+await write("/about/", { title: `About ${cfg.name}`, desc: `Why ${cfg.name} was built for students and freshers in India.`,
+  body: `<div class="wrap article"><h1>About ${esc(cfg.name)}</h1><p>Students often apply to openings they are not eligible for and miss the ones they are. ${esc(cfg.name)} reads your resume, compares it with the conditions written in each job post and shows the result openly, so you can spend your effort where it counts.</p><h2>How we work</h2><ul><li>Every listing links to its source, where you apply.</li><li>We do not charge students to apply.</li><li>The AI is instructed never to invent experience, and you approve each change.</li></ul><h2>Contact</h2><p><a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a></p></div>` });
+
+await write("/privacy/", { title: `Privacy notice | ${cfg.name}`, desc: "What happens to your resume and personal data.",
+  body: `<div class="wrap article"><h1>Privacy notice</h1><p>This notice explains what ${esc(cfg.owner)} does with your information. Contact: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>.</p>
+<h2>Your resume</h2><p>The file is read inside your browser. We do not upload or save it, and we run no accounts or resume database. Closing the page clears it.</p>
+<h2>Job search</h2><p>When live search is on, our server receives the role type, city and experience level you chose, and passes a search phrase to the job search provider (OpenWeb Ninja JSearch). Your resume is not sent.</p>
+<h2>AI rewrite</h2><p>Only if you tick the consent box and press the button, resume text and any job description you pasted go through our server to Google's Gemini API. The software first removes email addresses, phone numbers, links, your detected name and some personal lines. Automatic removal can miss details, so delete anything private before using it. Depending on the plan used, Google may keep this text, have people review it and use it to improve its services. See Google's Gemini API terms.</p>
+<h2>Technical records</h2><p>Our host (Cloudflare) processes IP addresses to deliver and protect the site. For the daily AI limit we store a scrambled code made from your IP address and the date for up to one day.</p>
+<h2>Your choices</h2><p>You can use job matching and the resume score without the AI rewrite. To withdraw consent, simply stop using that feature. For questions, requests or complaints, email us. You may also approach the Data Protection Board of India where the law provides for it.</p>
+<h2>Age</h2><p>This service is for people aged 18 or older.</p></div>` });
+
+await write("/terms/", { title: `Terms of use | ${cfg.name}`, desc: "Terms for using the service.",
+  body: `<div class="wrap article"><h1>Terms of use</h1><ul><li>You must be 18 or older and upload only your own resume.</li><li>Job details come from third parties and may be out of date or wrong. Confirm everything on the source page.</li><li>Eligibility results and resume scores are automated guidance, not promises.</li><li>Check every AI suggestion. You are responsible for the truth of your resume.</li><li>We never ask students to pay to apply. Report any such request to <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>.</li><li>Do not misuse, overload or copy the service by automated means.</li><li>The service is provided as it is and may change or stop.</li></ul></div>` });
+
+await write("/404.html", { title: `Page not found | ${cfg.name}`, desc: "This page does not exist.", index: false, body: `<div class="wrap article"><h1>This page is not here</h1><p>The opening list may have changed.</p><p><a class="btn" href="/jobs/">Browse jobs by role</a></p></div>` });
+
+const day = (data.updated || new Date().toISOString()).slice(0, 10);
+await writeFile(new URL("public/sitemap.xml", root), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(p => `<url><loc>${BASE}${p}</loc>${p.startsWith("/jobs/") && data.updated ? `<lastmod>${day}</lastmod>` : ""}</url>`).join("\n")}\n</urlset>\n`);
+await writeFile(new URL("public/robots.txt", root), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${BASE}/sitemap.xml\n`);
+console.log(`Built ${pages.length} indexable pages.`);

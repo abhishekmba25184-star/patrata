@@ -1,0 +1,10 @@
+{"jobs":[
+{"id":"s1","title":"Management Trainee - Finance","company":"Example Company A","location":"Mumbai","url":"","source":"Example","description":"Open to MBA or PGDM graduates of the 2027 batch. Freshers can apply. Skills: Excel, financial modelling, valuation, financial analysis, PowerPoint."},
+{"id":"s2","title":"Marketing Intern","company":"Example Company B","location":"Bengaluru","url":"","source":"Example","description":"Internship in digital marketing. SEO, social media, content writing, market research, Excel."},
+{"id":"s3","title":"Data Analyst","company":"Example Company C","location":"Pune","url":"","source":"Example","description":"0-2 years of experience. SQL, Python, Power BI, Excel and statistics."},
+{"id":"s4","title":"Software Engineer","company":"Example Company D","location":"Hyderabad","url":"","source":"Example","description":"B.Tech in computer science. Minimum 1 year of experience. Java, JavaScript, React, data structures, Git."},
+{"id":"s5","title":"Business Analyst","company":"Example Company E","location":"Gurugram","url":"","source":"Example","description":"2-4 years of experience. SQL, Excel, stakeholder management, strategy."},
+{"id":"s6","title":"Senior Financial Analyst","company":"Example Company F","location":"Remote","url":"","source":"Example","description":"5+ years of experience in FP&A, financial modelling, Excel."},
+{"id":"s7","title":"HR Trainee","company":"Example Company G","location":"Jaipur","url":"","source":"Example","description":"Fresher MBA or BBA. Recruitment, HR operations, communication, Excel."},
+{"id":"s8","title":"Operations Executive","company":"Example Company H","location":"Chennai","url":"","source":"Example","description":"0-1 years. Operations, supply chain, logistics, Excel, vendor management."}
+]}

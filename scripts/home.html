@@ -1,0 +1,106 @@
+<section class="hero" id="start"><div class="wrap">
+<div>
+<h1>Find the jobs your resume is eligible for</h1>
+<p class="lead">Upload your resume. See openings across India that fit it, which conditions you meet for each one, and what to fix before you apply.</p>
+<div class="drop" id="drop">
+<h2>Start with your resume</h2>
+<p>Drop a PDF or Word file here. It is read on your device and is not stored.</p>
+<label class="consent"><input type="checkbox" id="agree"><span>I am 18 or older and I agree to the <a href="/terms/">terms</a> and <a href="/privacy/">privacy notice</a>.</span></label>
+<div class="row"><button type="button" class="btn" id="pick">Choose resume file</button><button type="button" class="btn alt" id="showpaste">Paste text instead</button></div>
+<input type="file" id="file" accept=".pdf,.docx,.txt" hidden>
+<div id="pastebox" hidden style="margin-top:14px"><label class="f" for="paste">Resume text</label><textarea id="paste"></textarea><button type="button" class="btn" id="usepaste" style="margin-top:10px">Read this text</button></div>
+<p class="status" id="status" role="status"></p>
+</div>
+</div>
+<div class="slip" aria-label="Example of an eligibility check">
+<header><h2>Management Trainee, Finance</h2><span class="stamp check">Check criteria</span></header>
+<div class="body">
+<p>An example of what you see for each opening.</p>
+<ul class="checks">
+<li class="pass"><span class="tick" aria-label="met"></span><b>Batch</b><span>Meant for 2027. Yours is 2027.</span></li>
+<li class="pass"><span class="tick" aria-label="met"></span><b>Degree</b><span>MBA or PGDM. You have it.</span></li>
+<li class="pass"><span class="tick" aria-label="met"></span><b>Experience</b><span>Open to freshers.</span></li>
+<li class="check"><span class="tick" aria-label="please check"></span><b>CGPA</b><span>Asks for 7.0 or higher. Add yours to confirm.</span></li>
+</ul>
+<div class="chips" style="margin-top:14px"><span class="chip have">✓ Excel</span><span class="chip have">✓ Valuation</span><span class="chip miss">Not on resume: Power BI</span></div>
+</div>
+</div>
+</div></section>
+
+<div id="workspace" hidden>
+<section class="band"><div class="wrap">
+<div class="sec-head"><h2>Check what we read</h2><p>Correct anything that is wrong. Eligibility depends on these details.</p></div>
+<div class="panel"><div class="formgrid">
+<div><label class="f" for="p-year">Graduation year</label><input type="number" id="p-year" min="2000" max="2035"></div>
+<div><label class="f" for="p-exp">Full-time experience (years)</label><input type="number" id="p-exp" min="0" max="40" step="0.5"></div>
+<div><label class="f" for="p-cgpa">CGPA out of 10</label><input type="number" id="p-cgpa" min="0" max="10" step="0.01"></div>
+<div><label class="f" for="p-city">Preferred city</label><select id="p-city"><option value="">Anywhere in India</option></select></div>
+<div class="full"><span class="f"><b>Degrees, completed or in progress</b></span><div class="chips" id="p-degrees"></div></div>
+<div class="full"><span class="f"><b>Kinds of role you want</b></span><div class="chips" id="p-roles"></div></div>
+<div class="full"><span class="f"><b>Skills found. Select one to remove it.</b></span><div class="chips" id="p-skills"></div>
+<form class="addrow" id="addskill"><input type="text" id="newskill" list="skilllist" placeholder="Add a skill" aria-label="Add a skill"><datalist id="skilllist"></datalist><button class="btn alt small">Add</button></form></div>
+</div>
+<p style="margin-top:22px"><button type="button" class="btn" id="find">Show my matching jobs</button></p>
+<p class="status err" id="findmsg" role="status"></p>
+</div>
+</div></section>
+
+<section class="band" id="output" hidden><div class="wrap">
+<div class="tabs" role="tablist">
+<button type="button" role="tab" data-tab="jobs" aria-selected="true">Matching jobs</button>
+<button type="button" role="tab" data-tab="improve" aria-selected="false">Improve resume</button>
+<button type="button" role="tab" data-tab="portals" aria-selected="false">More places to search</button>
+</div>
+
+<div data-panel="jobs">
+<div class="notice" id="samplenote" hidden><strong>These are example listings, not real openings.</strong> Live job data has not been loaded on this site yet. Use "More places to search" for real openings.</div>
+<div class="count" id="counts"></div>
+<p id="freshness" style="margin-bottom:14px"></p>
+<div class="results">
+<aside class="filters" aria-label="Filter jobs">
+<div><label class="f" for="f-q">Role or company</label><input type="search" id="f-q"></div>
+<div><label class="f" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select></div>
+<div><label class="f" for="f-type">Type</label><select id="f-type"><option value="">Jobs and internships</option><option value="intern">Internships</option><option value="job">Jobs</option></select></div>
+<div id="unlockbox"><h3>Skills that come up</h3><p>Asked in your matches but not on your resume.</p><ul id="unlocks" style="margin:8px 0 0 18px"></ul></div>
+</aside>
+<div><div id="list" aria-live="polite"></div><button type="button" class="btn alt" id="more" hidden>Show more jobs</button></div>
+</div>
+</div>
+
+<div data-panel="improve" hidden>
+<div class="two">
+<div class="panel"><h3>Your resume score</h3><p><span class="score" id="score">0</span> out of 100</p><ul class="bars" id="scorebars"></ul></div>
+<div class="panel"><h3>Tailor to a job</h3><label class="f" for="jd" style="margin-top:12px">Job description</label><textarea id="jd" placeholder="Paste a job description here"></textarea><p id="jdnote"></p><div id="gap"></div>
+<h3 style="margin-top:22px">Rewrite with AI</h3>
+<label class="consent"><input type="checkbox" id="aiagree"><span>Send my resume text to Google's Gemini AI. Contact details and name are removed where detected. Google may store, review and use this text to improve its services. <a href="/privacy/">Details</a></span></label>
+<p style="margin-top:14px"><button type="button" class="btn" id="ai">Rewrite my resume points</button></p><p class="status" id="aimsg" role="status"></p></div>
+</div>
+<div class="panel" id="aiout" hidden style="margin-top:24px"><h3>Review the suggestions</h3><p>Edit freely. Keep only what is true.</p>
+<label class="f" for="summary" style="margin-top:14px">Profile summary</label><textarea id="summary"></textarea>
+<div id="rewrites" style="margin-top:16px"></div><h3>Next steps</h3><ul id="advice" style="margin:8px 0 18px 20px"></ul>
+<button type="button" class="btn" id="download">Download improved resume (Word)</button><p class="status" id="dlmsg" role="status"></p></div>
+</div>
+
+<div data-panel="portals" hidden><div class="sec-head"><p>Each link opens a search already filled in with your role and city, on that site.</p></div><div class="links" id="portals"></div></div>
+</div></section>
+</div>
+
+<section class="band"><div class="wrap">
+<div class="sec-head"><h2>From resume to application</h2></div>
+<ol class="steps">
+<li><h3>Upload</h3><p>Add your resume as a PDF or Word file.</p></li>
+<li><h3>Confirm</h3><p>Check the degree, batch, experience and skills we read.</p></li>
+<li><h3>Compare</h3><p>See each opening marked eligible, to be checked, or not yet eligible, with the reason.</p></li>
+<li><h3>Improve and apply</h3><p>Tailor your resume, then apply on the source site.</p></li>
+</ol>
+</div></section>
+
+<section class="band white"><div class="wrap">
+<div class="sec-head"><h2>Browse jobs by role</h2></div>
+<ul class="dir">{{DIRECTORY}}</ul>
+</div></section>
+
+<section class="band"><div class="wrap faq">
+<div class="sec-head"><h2>Questions students ask</h2></div>
+{{FAQ}}
+</div></section>
