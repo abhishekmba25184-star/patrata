@@ -126,11 +126,30 @@ async function workday(c) {
   return fromWorkday(trimmed, details, c.name, c);
 }
 
+export function fromRecruitee(body, company) {
+  return (body.offers || []).map(j => ({
+    id: `rc-${j.id}`, title: j.title, company, location: [j.city, j.state_name || j.state, j.country].filter(Boolean).join(", ") || j.location || "",
+    where: [j.location, j.country, j.country_code === "IN" ? "India" : ""].filter(Boolean).join("; "), url: j.careers_url || j.careers_apply_url,
+    posted: j.published_at || j.created_at || null, source: "Company career page", remote: Boolean(j.remote),
+    description: toText([j.description, j.requirements].filter(Boolean).join("\n"))
+  }));
+}
+export function fromWorkable(body, company) {
+  return (body.jobs || []).map(j => ({
+    id: `wk-${j.shortcode || j.id}`, title: j.title, company, location: [j.city, j.state, j.country].filter(Boolean).join(", "),
+    where: [...(j.locations || []).map(l => [l.city, l.region, l.country].filter(Boolean).join(", ")), j.country].filter(Boolean).join("; "),
+    url: j.url || j.shortlink || j.application_url, posted: j.published_on || j.created_at || null, source: "Company career page",
+    remote: Boolean(j.telecommuting), description: toText(j.description || "")
+  }));
+}
+
 const BOARDS = {
   greenhouse: { urls: s => [`https://boards-api.greenhouse.io/v1/boards/${s}/jobs?content=true`, `https://boards-api.eu.greenhouse.io/v1/boards/${s}/jobs?content=true`], map: fromGreenhouse },
   lever: { urls: s => [`https://api.lever.co/v0/postings/${s}?mode=json`, `https://api.eu.lever.co/v0/postings/${s}?mode=json`], map: fromLever },
   ashby: { urls: s => [`https://api.ashbyhq.com/posting-api/job-board/${s}`], map: fromAshby },
   smartrecruiters: { run: smartRecruiters },
+  recruitee: { urls: s => [`https://${s}.recruitee.com/api/offers/`], map: fromRecruitee },
+  workable: { urls: s => [`https://www.workable.com/api/accounts/${s}?details=true`, `https://apply.workable.com/api/v1/widget/accounts/${s}?details=true`], map: fromWorkable },
   workday: { run: workday }
 };
 
@@ -145,11 +164,48 @@ async function fetchCompany(c) {
   throw new Error(last);
 }
 
+// Finds which hiring system a company uses by trying the usual board addresses.
+export function slugGuesses(name) {
+  const base = name.replace(/\(.*?\)/g, "").replace(/&/g, "and").trim();
+  const flat = base.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const dashed = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const camel = base.replace(/[^A-Za-z0-9]/g, "");
+  const tries = [];
+  for (const s of new Set([flat, dashed])) tries.push({ ats: "greenhouse", slug: s }, { ats: "lever", slug: s }, { ats: "ashby", slug: s });
+  for (const s of new Set([camel, flat])) tries.push({ ats: "smartrecruiters", slug: s });
+  for (const s of new Set([flat, dashed])) tries.push({ ats: "recruitee", slug: s }, { ats: "workable", slug: s });
+  return tries;
+}
+async function discover(name) {
+  for (const t of slugGuesses(name)) {
+    const c = { name, ...t };
+    try {
+      if (t.ats === "smartrecruiters") {
+        const b = await getJson(`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(t.slug)}/postings?country=in&limit=1`);
+        if (b.totalFound > 0) return c;
+        continue;
+      }
+      // Accept a board only if it has openings in India, so a same-named company abroad is not mixed in.
+      const jobs = await fetchCompany(c);
+      if (jobs.some(j => inIndia(`${j.location}; ${j.where}`))) return c;
+    } catch { /* not on this system */ }
+  }
+  return null;
+}
+
 const slug = s => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 export const shardName = role => (role ? slug(role) : "other");
 
 async function main() {
-  const { companies } = JSON.parse(await readFile(new URL("scripts/companies.json", root)));
+  const config = JSON.parse(await readFile(new URL("scripts/companies.json", root)));
+  const known = await readFile(new URL("public/data/discovered.json", root)).then(JSON.parse).catch(() => ({}));
+  const listed = new Set(config.companies.map(c => c.name.toLowerCase()));
+  const week = 7 * 864e5, now = Date.now();
+  const toProbe = (config.discover || []).filter(n => !listed.has(n.toLowerCase()) && !(known[n] && (known[n].ats || now - Date.parse(known[n].checked) < week)));
+  const found = await pool(toProbe, 8, async n => ({ n, hit: await discover(n) }));
+  for (const { n, hit } of found.filter(Boolean)) known[n] = hit ? { ats: hit.ats, slug: hit.slug, checked: new Date().toISOString() } : { checked: new Date().toISOString() };
+  console.log(`Discovery: checked ${toProbe.length}, found ${found.filter(f => f?.hit).length}`);
+  const companies = [...config.companies, ...(config.discover || []).filter(n => !listed.has(n.toLowerCase()) && known[n]?.ats).map(n => ({ name: n, ats: known[n].ats, slug: known[n].slug }))];
   const previous = await readFile(new URL("public/data/jobs.json", root)).then(JSON.parse).catch(() => ({ jobs: [] }));
   const fresh = previous.updated && Date.now() - Date.parse(previous.updated) < 3 * 864e5;
   // Workday sites share servers and limit request rates, so they go one at a time.
@@ -175,6 +231,7 @@ async function main() {
   if (!jobs.length) { console.error("No jobs collected. Existing file left unchanged."); process.exit(1); }
   const updated = new Date().toISOString();
   await writeFile(new URL("public/data/jobs.json", root), JSON.stringify({ updated, jobs }));
+  await writeFile(new URL("public/data/discovered.json", root), JSON.stringify(known, null, 1));
   await writeFile(new URL("public/data/sources.json", root), JSON.stringify({ updated, sources: report }, null, 1));
   // Smaller files per kind of role, so phones download only what a student needs.
   const shards = {};
