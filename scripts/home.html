@@ -1,30 +1,37 @@
 <section class="hero" id="start"><div class="wrap">
 <div>
-<h1>Find the jobs your resume is eligible for</h1>
+<h1>Find the jobs your resume is <span class="nowrap">eligible for</span></h1>
 <p class="lead">Upload your resume. See openings across India that fit it, which conditions you meet for each one, and what to fix before you apply.</p>
+<dl class="stats" aria-label="Openings on this site now">
+<div><dt>openings right now</dt><dd data-count>{{OPENINGS}}</dd></div>
+<div><dt>employers hiring</dt><dd data-count>{{EMPLOYERS}}</dd></div>
+<div><dt>cities</dt><dd data-count>{{CITIES}}</dd></div>
+</dl>
 <div class="drop" id="drop">
-<h2>Start with your resume</h2>
-<p>Drop a PDF or Word file here. It is read on your device and is not stored.</p>
-<label class="consent"><input type="checkbox" id="agree"><span>I am 18 or older and I agree to the <a href="/terms/">terms</a> and <a href="/privacy/">privacy notice</a>.</span></label>
+<div class="drop-head"><span class="drop-icon" aria-hidden="true"></span><div><h2>Start with your resume</h2>
+<p>Drop a PDF or Word file here. It is read on your device and is not stored.</p></div></div>
+<label class="consent" id="consentrow"><input type="checkbox" id="agree"><span>I am 18 or older and I agree to the <a href="/terms/">terms</a> and <a href="/privacy/">privacy notice</a>.</span></label>
 <div class="row"><button type="button" class="btn" id="pick">Choose resume file</button><button type="button" class="btn alt" id="showpaste">Paste text instead</button></div>
 <input type="file" id="file" accept=".pdf,.docx,.txt" hidden>
 <div id="pastebox" hidden style="margin-top:14px"><label class="f" for="paste">Resume text</label><textarea id="paste"></textarea><button type="button" class="btn" id="usepaste" style="margin-top:10px">Read this text</button></div>
+<ol class="progress" id="progress" hidden aria-live="polite"></ol>
 <p class="status" id="status" role="status"></p>
 </div>
 </div>
-<div class="slip" aria-label="Example of an eligibility check">
-<header><h2>Management Trainee, Finance</h2><span class="stamp check">Check criteria</span></header>
+<figure class="slip live" id="slip" aria-label="Example of an eligibility check">
+<figcaption id="slipcap">Example check for a 2027 MBA fresher</figcaption>
+<header><div><h2 id="sliptitle">Management Trainee, Finance</h2><p id="slipco">Example company, Mumbai</p></div><span class="stamp check" id="slipstamp">Check criteria</span></header>
 <div class="body">
-<p>An example of what you see for each opening.</p>
-<ul class="checks">
+<ul class="checks" id="slipchecks">
 <li class="pass"><span class="tick" aria-label="met"></span><b>Batch</b><span>Meant for 2027. Yours is 2027.</span></li>
 <li class="pass"><span class="tick" aria-label="met"></span><b>Degree</b><span>MBA or PGDM. You have it.</span></li>
 <li class="pass"><span class="tick" aria-label="met"></span><b>Experience</b><span>Open to freshers.</span></li>
 <li class="check"><span class="tick" aria-label="please check"></span><b>CGPA</b><span>Asks for 7.0 or higher. Add yours to confirm.</span></li>
 </ul>
-<div class="chips" style="margin-top:14px"><span class="chip have">✓ Excel</span><span class="chip have">✓ Valuation</span><span class="chip miss">Not on resume: Power BI</span></div>
+<div class="chips" id="slipchips" style="margin-top:14px"><span class="chip have">✓ Excel</span><span class="chip have">✓ Valuation</span><span class="chip miss">Not on resume: Power BI</span></div>
 </div>
-</div>
+<footer class="slipnav" id="slipnav" hidden><div class="dots" id="slipdots" role="tablist" aria-label="Example openings"></div><a id="sliplink" href="/#start" target="_blank" rel="noopener nofollow">View this opening</a></footer>
+</figure>
 </div></section>
 
 <div id="workspace" hidden>
@@ -72,9 +79,9 @@
 <div class="two">
 <div class="panel"><h3>Your resume score</h3><p><span class="score" id="score">0</span> out of 100</p><ul class="bars" id="scorebars"></ul></div>
 <div class="panel"><h3>Tailor to a job</h3><label class="f" for="jd" style="margin-top:12px">Job description</label><textarea id="jd" placeholder="Paste a job description here"></textarea><p id="jdnote"></p><div id="gap"></div>
-<h3 style="margin-top:22px">Rewrite with AI</h3>
+<div id="aibox" hidden><h3 style="margin-top:22px">Rewrite with AI</h3>
 <label class="consent"><input type="checkbox" id="aiagree"><span>Send my resume text to Google's Gemini AI. Contact details and name are removed where detected. Google may store, review and use this text to improve its services. <a href="/privacy/">Details</a></span></label>
-<p style="margin-top:14px"><button type="button" class="btn" id="ai">Rewrite my resume points</button></p><p class="status" id="aimsg" role="status"></p></div>
+<p style="margin-top:14px"><button type="button" class="btn" id="ai">Rewrite my resume points</button></p><p class="status" id="aimsg" role="status"></p></div></div>
 </div>
 <div class="panel" id="aiout" hidden style="margin-top:24px"><h3>Review the suggestions</h3><p>Edit freely. Keep only what is true.</p>
 <label class="f" for="summary" style="margin-top:14px">Profile summary</label><textarea id="summary"></textarea>
@@ -94,6 +101,11 @@
 <li><h3>Compare</h3><p>See each opening marked eligible, to be checked, or not yet eligible, with the reason.</p></li>
 <li><h3>Improve and apply</h3><p>Tailor your resume, then apply on the source site.</p></li>
 </ol>
+</div></section>
+
+<section class="band employers"><div class="wrap">
+<div class="sec-head"><h2>Who is hiring today</h2><p>Openings collected from official career pages, with the number currently open in India.</p></div>
+<ul class="emplist">{{EMPLOYER_LIST}}</ul>
 </div></section>
 
 <section class="band white"><div class="wrap">

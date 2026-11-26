@@ -17,6 +17,7 @@ export function initImprove(fn) {
   });
   $("#jd").addEventListener("input", keywordGap);
   $("#ai").addEventListener("click", runAi);
+  fetch("/api/improve").then(r => (r.ok ? r.json() : null)).then(d => { $("#aibox").hidden = !d?.enabled; }).catch(() => {});
   $("#download").addEventListener("click", download);
 }
 

@@ -11,6 +11,11 @@ Rules you must follow:
 Return JSON only:
 {"summary":"2 to 3 sentence profile summary","rewrites":[{"index":0,"improved":"...","why":"one short reason"}],"advice":["up to 5 specific next steps, including skills to learn that the job asks for"]}`;
 
+// Lets the page show the AI section only when it can work.
+export function onRequestGet({ env }) {
+  return json({ enabled: Boolean(env.GEMINI_API_KEY) });
+}
+
 export async function onRequestPost({ request, env, waitUntil }) {
   if (!env.GEMINI_API_KEY) return json({ error: "AI rewrite is not switched on yet. Your score and tips above still work." }, 503);
   const origin = request.headers.get("origin");

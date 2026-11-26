@@ -1,6 +1,7 @@
 // Writes every HTML page, the sitemap and robots.txt. Run: node scripts/build-pages.mjs
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { ROLE_PAGES, GUIDES, FAQ } from "./content.mjs";
+import { checkEligibility, normaliseJob } from "../public/js/lib/match.js";
 
 const root = new URL("../", import.meta.url);
 const cfg = JSON.parse(await readFile(new URL("site.config.json", root)));
@@ -52,7 +53,7 @@ ${body}
 <div><h2>${esc(cfg.name)}</h2><p>Resume-based job matching for students and freshers across India. Applications happen on the employer's or job site's own page.</p></div>
 <div><h2>Jobs by role</h2><ul>${Object.values(ROLE_PAGES).slice(0, 6).map(r => `<li><a href="/jobs/${r.slug}-jobs/">${esc(r.slug.replace(/-/g, " "))} jobs</a></li>`).join("")}</ul></div>
 <div><h2>Guides</h2><ul>${GUIDES.map(g => `<li><a href="/guides/${g.slug}/">${esc(g.title.split(":")[0])}</a></li>`).join("")}</ul></div>
-<div><h2>About</h2><ul><li><a href="/about/">About us</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms of use</a></li><li><a href="mailto:${esc(cfg.email)}">Contact</a></li></ul></div>
+<div><h2>About</h2><ul><li><a href="/about/">About us</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms of use</a></li>${/example\.com$/.test(cfg.email) ? "" : `<li><a href="mailto:${esc(cfg.email)}">Contact</a></li>`}</ul></div>
 </div>
 <p class="fine">${esc(cfg.name)} is not affiliated with LinkedIn, Naukri or any employer listed. Never pay anyone to apply for a job.</p>
 </div></footer>
@@ -72,18 +73,51 @@ const crumbs = list => ({ "@context": "https://schema.org", "@type": "Breadcrumb
 const trail = list => `<p class="crumbs"><a href="/">Home</a>${list.map(([n, p], i) => (i === list.length - 1 ? ` / ${esc(n)}` : ` / <a href="${p}">${esc(n)}</a>`)).join("")}</p>`;
 const cta = `<p><a class="btn" href="/#start">Check which jobs I am eligible for</a></p>`;
 
+// Live numbers and real example openings for the home page.
+const jobsList = data.jobs || [];
+const byEmployer = {};
+for (const j of jobsList) byEmployer[j.company] = (byEmployer[j.company] || 0) + 1;
+const SAMPLE = { degrees: ["mba", "bcom"], gradYear: 2027, cgpa: 7.5, cgpaUg: 7.5, cgpaPg: 7.5, experienceYears: 0, experienceMonths: 0, skills: ["Excel", "SQL", "PowerPoint", "Market Research", "Financial Modelling"], roles: [], cities: [] };
+const ENTRYISH = /\b(intern|analyst|associate|trainee|executive|graduate|junior|specialist|officer|coordinator)\b/i;
+const samples = jobsList
+  .map(j => ({ j, r: checkEligibility(SAMPLE, j) }))
+  .filter(({ j, r }) => r.checks.some(c => c.name !== "Criteria") && j.title.length < 60 && j.skills.length >= 2)
+  .sort((a, b) => (ENTRYISH.test(b.j.title) - ENTRYISH.test(a.j.title)) || (b.r.checks.length - a.r.checks.length));
+const picked = [], seenCo = new Set();
+for (const want of ["eligible", "check", "eligible", "eligible", "no", "eligible", "check", "eligible"]) {
+  const hit = samples.find(x => x.r.verdict === want && !seenCo.has(x.j.company)) || samples.find(x => x.r.verdict === want && !picked.includes(x));
+  if (hit && !picked.includes(hit)) { picked.push(hit); seenCo.add(hit.j.company); }
+}
+const highlights = {
+  updated: data.updated, openings: jobsList.length, employers: Object.keys(byEmployer).length,
+  cities: new Set(jobsList.flatMap(j => j.cities)).size,
+  top: Object.entries(byEmployer).sort((a, b) => b[1] - a[1]).slice(0, 16),
+  samples: picked.map(({ j, r }) => ({ title: j.title, company: j.company, location: j.location.split(/[;,]/)[0], url: j.url, verdict: r.verdict,
+    checks: [...r.checks.filter(c => c.name !== "Criteria"),
+      (() => { const have = j.skills.filter(x => SAMPLE.skills.includes(x)); const ask = j.skills.slice(0, 4);
+        return { name: "Skills", state: have.length ? "pass" : "check", detail: `Asks for ${ask.join(", ")}. ${have.length ? `You have ${have.slice(0, 2).join(" and ")}.` : "None on this resume yet."}` }; })(),
+      { name: "Location", state: "pass", detail: `${j.location.split(/[;]/)[0]}${j.cities.includes("Remote") ? ", remote possible" : ""}.` }
+    ].slice(0, 4), have: j.skills.filter(s => SAMPLE.skills.includes(s)).slice(0, 3), miss: j.skills.filter(s => !SAMPLE.skills.includes(s)).slice(0, 2) }))
+};
+await writeFile(new URL("public/data/highlights.json", root), JSON.stringify(highlights));
+const hasEmail = !/example\.com$/.test(cfg.email);
+const mail = hasEmail ? `${mail}` : "the contact address that will be listed here";
+const fmt = n => Number(n).toLocaleString("en-IN");
+
 // Home
 const faqHtml = FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
 await write("/", {
   title: `${cfg.name}: Match your resume to jobs and check eligibility | Freshers India`,
   desc: "Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.",
-  body: home.replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
+  body: home.replace("{{OPENINGS}}", fmt(highlights.openings)).replace("{{EMPLOYERS}}", fmt(highlights.employers)).replace("{{CITIES}}", fmt(highlights.cities))
+    .replace("{{EMPLOYER_LIST}}", highlights.top.map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)}</span></li>`).join(""))
+    .replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
   schema: [
-    { "@context": "https://schema.org", "@type": "Organization", name: cfg.name, url: BASE, logo: `${BASE}/favicon.svg`, email: cfg.email },
+    { "@context": "https://schema.org", "@type": "Organization", name: cfg.name, url: BASE, logo: `${BASE}/favicon.svg`, ...(hasEmail ? { email: cfg.email } : {}) },
     { "@context": "https://schema.org", "@type": "WebSite", name: cfg.name, url: BASE, inLanguage: "en-IN" },
     { "@context": "https://schema.org", "@type": "WebApplication", name: cfg.name, url: BASE, applicationCategory: "BusinessApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "INR" } }
   ],
-  script: '<script type="module" src="/js/app.js"></script>'
+  script: '<script type="module" src="/js/app.js"></script>\n<script type="module" src="/js/hero.js"></script>'
 });
 
 // Role and city pages
@@ -156,10 +190,10 @@ await write("/resume-checker/", { title: `Free resume checker for freshers in In
 <p>The score is a writing and structure guide. It is not the score of any employer's software, and a high number does not guarantee a shortlist.</p><p>Read the <a href="/guides/ats-resume-for-freshers/">ATS resume guide for freshers</a>.</p></div>` });
 
 await write("/about/", { title: `About ${cfg.name}`, desc: `Why ${cfg.name} was built for students and freshers in India.`,
-  body: `<div class="wrap article"><h1>About ${esc(cfg.name)}</h1><p>Students often apply to openings they are not eligible for and miss the ones they are. ${esc(cfg.name)} reads your resume, compares it with the conditions written in each job post and shows the result openly, so you can spend your effort where it counts.</p><h2>How we work</h2><ul><li>Every listing links to its source, where you apply.</li><li>We do not charge students to apply.</li><li>The AI is instructed never to invent experience, and you approve each change.</li></ul><h2>Contact</h2><p><a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a></p></div>` });
+  body: `<div class="wrap article"><h1>About ${esc(cfg.name)}</h1><p>Students often apply to openings they are not eligible for and miss the ones they are. ${esc(cfg.name)} reads your resume, compares it with the conditions written in each job post and shows the result openly, so you can spend your effort where it counts.</p><h2>How we work</h2><ul><li>Every listing links to its source, where you apply.</li><li>We do not charge students to apply.</li><li>The AI is instructed never to invent experience, and you approve each change.</li></ul><h2>Contact</h2><p>${mail}</p></div>` });
 
 await write("/privacy/", { title: `Privacy notice | ${cfg.name}`, desc: "What happens to your resume and personal data.",
-  body: `<div class="wrap article"><h1>Privacy notice</h1><p>This notice explains what ${esc(cfg.owner)} does with your information. Contact: <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>.</p>
+  body: `<div class="wrap article"><h1>Privacy notice</h1><p>This notice explains what ${esc(cfg.owner)} does with your information. Contact: ${mail}.</p>
 <h2>Your resume</h2><p>The file is read inside your browser. We do not upload or save it, and we run no accounts or resume database. Closing the page clears it.</p>
 <h2>Job search</h2><p>When live search is on, our server receives the role type, city and experience level you chose, and passes a search phrase to the job search providers we use (Careerjet and OpenWeb Ninja JSearch). Careerjet also requires your IP address and browser type with each search. Your resume is not sent.</p>
 <h2>AI rewrite</h2><p>Only if you tick the consent box and press the button, resume text and any job description you pasted go through our server to Google's Gemini API. The software first removes email addresses, phone numbers, links, your detected name and some personal lines. Automatic removal can miss details, so delete anything private before using it. Depending on the plan used, Google may keep this text, have people review it and use it to improve its services. See Google's Gemini API terms.</p>
@@ -168,7 +202,7 @@ await write("/privacy/", { title: `Privacy notice | ${cfg.name}`, desc: "What ha
 <h2>Age</h2><p>This service is for people aged 18 or older.</p></div>` });
 
 await write("/terms/", { title: `Terms of use | ${cfg.name}`, desc: "Terms for using the service.",
-  body: `<div class="wrap article"><h1>Terms of use</h1><ul><li>You must be 18 or older and upload only your own resume.</li><li>Job details come from third parties and may be out of date or wrong. Confirm everything on the source page.</li><li>Eligibility results and resume scores are automated guidance, not promises.</li><li>Check every AI suggestion. You are responsible for the truth of your resume.</li><li>We never ask students to pay to apply. Report any such request to <a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>.</li><li>Do not misuse, overload or copy the service by automated means.</li><li>The service is provided as it is and may change or stop.</li></ul></div>` });
+  body: `<div class="wrap article"><h1>Terms of use</h1><ul><li>You must be 18 or older and upload only your own resume.</li><li>Job details come from third parties and may be out of date or wrong. Confirm everything on the source page.</li><li>Eligibility results and resume scores are automated guidance, not promises.</li><li>Check every AI suggestion. You are responsible for the truth of your resume.</li><li>We never ask students to pay to apply. Report any such request to ${mail}.</li><li>Do not misuse, overload or copy the service by automated means.</li><li>The service is provided as it is and may change or stop.</li></ul></div>` });
 
 await write("/404.html", { title: `Page not found | ${cfg.name}`, desc: "This page does not exist.", index: false, body: `<div class="wrap article"><h1>This page is not here</h1><p>The opening list may have changed.</p><p><a class="btn" href="/jobs/">Browse jobs by role</a></p></div>` });
 

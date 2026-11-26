@@ -25,32 +25,57 @@ const state = { text: "", profile: null, jobs: [], ranked: [], sample: false, up
 
 /* ---------- upload ---------- */
 const status = (msg, err = false) => { const s = $("#status"); s.textContent = msg; s.classList.toggle("err", err); };
+function askConsent(msg) {
+  status(msg, true);
+  const row = $("#consentrow");
+  row.classList.remove("nudge"); void row.offsetWidth; row.classList.add("nudge");
+  $("#agree").focus();
+}
 
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wait = ms => new Promise(r => setTimeout(r, still ? 0 : ms));
+
+// Shows what was found, one line at a time, before opening the details form.
 async function useText(text) {
   state.text = joinWrapped(text);
-  state.profile = parseProfile(state.text);
-  status("Resume read. Check your details below.");
+  const p = state.profile = parseProfile(state.text);
+  const label = id => DEGREES.find(d => d.id === id)?.label || id;
+  const months = p.experienceMonths || 0;
+  const lines = [
+    `Read about ${state.text.split(/\s+/).length.toLocaleString("en-IN")} words`,
+    p.degrees.length ? `Found ${p.degrees.map(label).join(", ")}${p.gradYear ? `, graduating ${p.gradYear}` : ""}` : "No degree found. You can add it below",
+    months ? `${months} month${months === 1 ? "" : "s"} of full-time work${p.internshipMonths ? ` and ${p.internshipMonths} of internships` : ""}` : p.internshipMonths ? `${p.internshipMonths} months of internships` : "No full-time work found, so treated as a fresher",
+    `${p.skills.length} skill${p.skills.length === 1 ? "" : "s"} recognised${p.cgpaPg || p.cgpaUg ? `, CGPA ${[p.cgpaUg && `UG ${p.cgpaUg}`, p.cgpaPg && `PG ${p.cgpaPg}`].filter(Boolean).join(" and ")}` : ""}`
+  ];
+  const box = $("#progress");
+  box.replaceChildren();
+  box.hidden = false;
+  status("");
+  for (const line of lines) { box.append(el("li", {}, line)); await wait(380); }
+  status("Check your details below and correct anything we missed.");
   $("#workspace").hidden = false;
   fillProfile();
+  await wait(250);
   $("#workspace").scrollIntoView();
 }
 
 async function handleFile(file) {
   if (!file) return;
-  if (!$("#agree").checked) return status("Tick the box below first, then choose your file.", true);
+  if (!$("#agree").checked) return askConsent("Tick the box above first, then choose your file.");
   status("Reading your resume…");
   try { await useText(await readResume(file)); } catch (e) { status(e.message || "The file could not be read.", true); }
 }
 
 $("#file").addEventListener("change", e => { handleFile(e.target.files[0]); e.target.value = ""; });
-$("#pick").addEventListener("click", () => ($("#agree").checked ? $("#file").click() : status("Tick the box below first, then choose your file.", true)));
+$("#pick").addEventListener("click", () => ($("#agree").checked ? $("#file").click() : askConsent("Tick the box above first, then choose your file.")));
+$("#agree").addEventListener("change", e => { if (e.target.checked) status(""); });
 const drop = $("#drop");
 ["dragover", "dragenter"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
 drop.addEventListener("drop", e => handleFile(e.dataTransfer.files[0]));
 $("#showpaste").addEventListener("click", () => { $("#pastebox").hidden = false; $("#paste").focus(); });
 $("#usepaste").addEventListener("click", () => {
-  if (!$("#agree").checked) return status("Tick the box below first.", true);
+  if (!$("#agree").checked) return askConsent("Tick the box above first.");
   const t = $("#paste").value;
   if (t.trim().length < 150) return status("Paste the full resume text, not only a few lines.", true);
   useText(t);
@@ -103,12 +128,13 @@ $("#find").addEventListener("click", async () => {
   p.cities = $("#p-city").value ? [$("#p-city").value] : [];
   if (!p.roles.length) { $("#findmsg").textContent = "Choose at least one kind of role."; return; }
   $("#findmsg").textContent = "";
-  const btn = $("#find"); btn.disabled = true; btn.textContent = "Matching jobs…";
+  const btn = $("#find"); btn.disabled = true; btn.textContent = "Checking openings…";
   await loadJobs(p);
   state.ranked = rankJobs(p, state.jobs);
   state.shown = 20; state.filter.verdict = "";
   btn.disabled = false; btn.textContent = "Show my matching jobs";
   $("#output").hidden = false;
+  state.fresh = true;
   render(); renderPortals(); refreshImprove();
   $("#output").scrollIntoView();
 });
@@ -167,9 +193,19 @@ function render() {
   $("#freshness").textContent = state.updated ? `Career page openings last refreshed ${new Date(state.updated).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}.` : "";
   $("#counts").replaceChildren(...Object.entries(VERDICT).map(([k, label]) =>
     el("button", { type: "button", class: k, "aria-pressed": String(state.filter.verdict === k), onclick: () => { state.filter.verdict = state.filter.verdict === k ? "" : k; state.shown = 20; render(); } },
-      el("strong", {}, String(state.ranked.filter(r => r.verdict === k).length)), label)));
+      el("strong", { "data-n": state.ranked.filter(r => r.verdict === k).length }, String(state.ranked.filter(r => r.verdict === k).length)), label)));
+  if (state.fresh && !still) {
+    for (const n of $$("#counts strong")) {
+      const target = +n.dataset.n, t0 = performance.now();
+      const step = now => { const p = Math.min(1, (now - t0) / 700); n.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
+  }
   const list = filtered();
-  $("#list").replaceChildren(...(list.length ? list.slice(0, state.shown).map(jobCard)
+  const cards = list.slice(0, state.shown).map(jobCard);
+  if (state.fresh && !still) cards.slice(0, 8).forEach((c, k) => { c.classList.add("enter"); c.style.setProperty("--n", k); });
+  state.fresh = false;
+  $("#list").replaceChildren(...(list.length ? cards
     : [el("div", { class: "empty" }, el("h3", {}, "No jobs match these choices"), el("p", {}, "Clear a filter, add another kind of role, or open the More places to search tab."))]));
   $("#more").hidden = list.length <= state.shown;
   const unlocks = skillUnlocks(state.ranked);
