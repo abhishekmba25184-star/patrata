@@ -37,12 +37,12 @@ const MAX_PER_COMPANY = 300;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // Waits and tries again when a site says "too many requests".
-async function getJson(url, init = {}) {
+async function getJson(url, init = {}, retries = 4) {
   for (let attempt = 0; ; attempt++) {
     const r = await fetch(url, { ...init, signal: AbortSignal.timeout(30000), headers: { ...UA, ...(init.headers || {}) } });
     if (r.ok) return r.json();
-    if ((r.status === 429 || r.status === 503) && attempt < 4) {
-      const wait = Math.min(60, +r.headers.get("retry-after") || 5 * 2 ** attempt);
+    if ((r.status === 429 || r.status === 503) && attempt < retries) {
+      const wait = Math.min(20, +r.headers.get("retry-after") || 5 * 2 ** attempt);
       await sleep(wait * 1000);
       continue;
     }
@@ -107,14 +107,20 @@ export function fromWorkday(list, details, company, c) {
 }
 
 const WORKDAY_MAX = 150;
+// Workday sites limit request rates. Each company gets a few minutes at most, and all Workday
+// companies together get a time budget, so one slow site cannot hold up the daily refresh.
+const WORKDAY_BUDGET = 25 * 60 * 1000;
+const runStart = Date.now();
 async function workday(c) {
+  if (Date.now() - runStart > WORKDAY_BUDGET) throw new Error("skipped: time budget used");
+  const deadline = Date.now() + 4 * 60 * 1000;
   const api = `https://${c.host}/wday/cxs/${c.tenant}/${c.site}`;
-  const post = body => getJson(`${api}/jobs`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const post = body => getJson(`${api}/jobs`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }, 2);
   const first = await post({ appliedFacets: {}, limit: 20, offset: 0, searchText: "" });
   const india = indiaFacet(first.facets);
   const base = india ? { appliedFacets: { [india.param]: [india.id] }, searchText: "" } : { appliedFacets: {}, searchText: "India" };
   const list = [];
-  for (let offset = 0; list.length < WORKDAY_MAX; offset += 20) {
+  for (let offset = 0; list.length < WORKDAY_MAX && Date.now() < deadline; offset += 20) {
     await sleep(400);
     const body = await post({ ...base, limit: 20, offset });
     const page = body.jobPostings || [];
@@ -122,7 +128,13 @@ async function workday(c) {
     if (page.length < 20 || offset + 20 >= (body.total || 0)) break;
   }
   const trimmed = list.slice(0, WORKDAY_MAX);
-  const details = await pool(trimmed, 2, async j => { await sleep(250); return getJson(`${api}${j.externalPath}`); });
+  // Descriptions are optional: stop asking for them if the site starts refusing or time runs out.
+  let refusals = 0;
+  const details = await pool(trimmed, 2, async j => {
+    if (refusals >= 3 || Date.now() > deadline) return null;
+    await sleep(250);
+    try { return await getJson(`${api}${j.externalPath}`, {}, 1); } catch (e) { refusals++; return null; }
+  });
   return fromWorkday(trimmed, details, c.name, c);
 }
 
