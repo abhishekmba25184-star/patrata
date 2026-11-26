@@ -33,7 +33,7 @@ ${cfg.googleVerification ? `<meta name="google-site-verification" content="${esc
 <meta property="og:url" content="${url}">
 <meta property="og:image" content="${BASE}/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#2f655c">
+<meta name="theme-color" content="#1f3fa8">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/styles.css">
@@ -43,7 +43,7 @@ ${schema.map(ld).join("\n")}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="logo" href="/"><span class="mark" aria-hidden="true"></span>${esc(cfg.name)}</a>
-<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a><a href="/guides/">Guides</a></nav>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a><a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
 </div></header>
 <main id="main">
 ${body}
@@ -57,6 +57,7 @@ ${body}
 </div>
 <p class="fine">${esc(cfg.name)} is not affiliated with LinkedIn, Naukri or any employer listed. Never pay anyone to apply for a job.</p>
 </div></footer>
+<script type="module" src="/js/saved.js"></script>
 ${script}
 </body>
 </html>
@@ -92,17 +93,35 @@ const highlights = {
   updated: data.updated, openings: jobsList.length, employers: Object.keys(byEmployer).length,
   cities: new Set(jobsList.flatMap(j => j.cities)).size,
   top: Object.entries(byEmployer).sort((a, b) => b[1] - a[1]).slice(0, 16),
-  samples: picked.map(({ j, r }) => ({ title: j.title, company: j.company, location: j.location.split(/[;,]/)[0], url: j.url, verdict: r.verdict,
+  samples: picked.map(({ j, r }) => ({ title: j.title, company: j.company, location: String(j.location).split(/[;,]/)[0].trim().replace(/\b[a-z]/g, c => c.toUpperCase()), url: j.url, verdict: r.verdict,
     checks: [...r.checks.filter(c => c.name !== "Criteria"),
       (() => { const have = j.skills.filter(x => SAMPLE.skills.includes(x)); const ask = j.skills.slice(0, 4);
         return { name: "Skills", state: have.length ? "pass" : "check", detail: `Asks for ${ask.join(", ")}. ${have.length ? `You have ${have.slice(0, 2).join(" and ")}.` : "None on this resume yet."}` }; })(),
-      { name: "Location", state: "pass", detail: `${j.location.split(/[;]/)[0]}${j.cities.includes("Remote") ? ", remote possible" : ""}.` }
+      { name: "Location", state: "pass", detail: `${String(j.location).split(/[;]/)[0].replace(/(\s*,\s*)+/g, ", ").replace(/,\s*$/, "")}${j.cities.includes("Remote") ? ", remote possible" : ""}.` }
     ].slice(0, 4), have: j.skills.filter(s => SAMPLE.skills.includes(s)).slice(0, 3), miss: j.skills.filter(s => !SAMPLE.skills.includes(s)).slice(0, 2) }))
 };
 await writeFile(new URL("public/data/highlights.json", root), JSON.stringify(highlights));
 const hasEmail = !/example\.com$/.test(cfg.email);
-const mail = hasEmail ? `${mail}` : "the contact address that will be listed here";
+const mail = hasEmail ? `<a href="mailto:${esc(cfg.email)}">${esc(cfg.email)}</a>` : "the contact address that will be listed here";
 const fmt = n => Number(n).toLocaleString("en-IN");
+
+const tidyPlace = s => String(s || "").split(/;/)[0].replace(/(\s*,\s*)+/g, ", ").replace(/^,\s*|,\s*$/g, "").trim().replace(/\b[a-z]/g, c => c.toUpperCase()) || "India";
+// Specialisation hub: live openings per field, fresher-friendly first.
+const seniorTitle = j => /\b(senior|sr\.?|lead|head|director|principal|staff|vp|vice president|manager)\b/i.test(j.title) || (j.criteria.minExp ?? 0) > 2;
+const ago = d => { const days = Math.floor((Date.now() - Date.parse(d)) / 864e5); return !d || isNaN(days) ? "" : days <= 1 ? "today" : days < 7 ? `${days} days ago` : days < 14 ? "1 week ago" : days < 60 ? `${Math.floor(days / 7)} weeks ago` : ""; };
+const specs = Object.entries(ROLE_PAGES).map(([name, r]) => {
+  const all = jobsList.filter(j => j.roles.includes(name));
+  const entry = all.filter(j => !seniorTitle(j)).sort((a, b) => (a.criteria.minExp ?? 1.5) - (b.criteria.minExp ?? 1.5) || String(b.posted).localeCompare(String(a.posted)));
+  return { name, slug: r.slug, total: all.length, entry: entry.length, list: entry.slice(0, 6) };
+}).filter(x => x.total);
+const SPEC_ORDER = ["Finance", "Marketing", "Data and Analytics", "Sales and Business Development", "Strategy and Consulting", "Operations and Supply Chain", "Human Resources", "Product", "Software Development", "Design"];
+specs.sort((a, b) => (SPEC_ORDER.indexOf(a.name) + 1 || 99) - (SPEC_ORDER.indexOf(b.name) + 1 || 99));
+const specTabs = specs.map((x, k) => `<button type="button" role="tab" id="spt-${x.slug}" aria-controls="spp-${x.slug}" aria-selected="${k === 0}"><span>${esc(x.name)}</span><b>${fmt(x.total)}</b></button>`).join("");
+const specPanels = specs.map((x, k) => `<div role="tabpanel" id="spp-${x.slug}" aria-labelledby="spt-${x.slug}"${k ? " hidden" : ""}>
+<p class="spec-sum"><b>${fmt(x.total)}</b> openings in ${esc(x.name.toLowerCase())}, <b>${fmt(x.entry)}</b> of them open to freshers or early-career applicants.</p>
+<ol class="spec-list">${x.list.map(j => `<li><a href="${esc(/^https?:/.test(j.url) ? j.url : "/#start")}" target="_blank" rel="noopener nofollow"><span class="t">${esc(j.title)}</span><span class="c">${esc(j.company)}</span><span class="l">${esc(tidyPlace(j.location))}</span>${ago(j.posted) ? `<span class="a">${ago(j.posted)}</span>` : ""}</a></li>`).join("")}</ol>
+<p class="spec-cta"><a class="btn" href="/#start">Check my eligibility for these</a><a class="btn alt" href="/jobs/${x.slug}-jobs/">All ${esc(x.name.toLowerCase())} openings</a></p>
+</div>`).join("\n");
 
 // Home
 const faqHtml = FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
@@ -111,7 +130,7 @@ await write("/", {
   desc: "Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.",
   body: home.replace("{{OPENINGS}}", fmt(highlights.openings)).replace("{{EMPLOYERS}}", fmt(highlights.employers)).replace("{{CITIES}}", fmt(highlights.cities))
     .replace("{{EMPLOYER_LIST}}", highlights.top.map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)}</span></li>`).join(""))
-    .replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
+    .replace("{{SPEC_TABS}}", specTabs).replace("{{SPEC_PANELS}}", specPanels).replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
   schema: [
     { "@context": "https://schema.org", "@type": "Organization", name: cfg.name, url: BASE, logo: `${BASE}/favicon.svg`, ...(hasEmail ? { email: cfg.email } : {}) },
     { "@context": "https://schema.org", "@type": "WebSite", name: cfg.name, url: BASE, inLanguage: "en-IN" },

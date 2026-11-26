@@ -85,5 +85,24 @@ async function slip() {
   restart();
 }
 
+// Specialisation tabs, with arrow-key support.
+function specTabs() {
+  const tabs = [...document.querySelectorAll(".spec-tabs [role=tab]")];
+  const pick = t => {
+    tabs.forEach(x => { const on = x === t; x.setAttribute("aria-selected", String(on)); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute("aria-controls")).hidden = !on; });
+  };
+  tabs.forEach((t, k) => {
+    t.tabIndex = k ? -1 : 0;
+    t.addEventListener("click", () => pick(t));
+    t.addEventListener("keydown", e => {
+      const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (!d) return;
+      e.preventDefault();
+      const n = tabs[(k + d + tabs.length) % tabs.length]; n.focus(); pick(n);
+    });
+  });
+}
+
 countUp();
 slip();
+specTabs();

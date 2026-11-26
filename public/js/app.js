@@ -4,6 +4,7 @@ import { SKILLS, ROLE_FAMILIES, CITIES, findSkills } from "./lib/skills.js";
 import { readResume } from "./reader.js";
 import { initImprove, refreshImprove } from "./improve.js";
 import { portalLinks } from "./portals.js";
+import { isSaved, toggleSaved, shareLink } from "./lib/store.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -21,7 +22,7 @@ export function el(tag, attrs = {}, ...kids) {
 }
 const safeUrl = u => (/^https?:\/\//i.test(u || "") ? u : "#");
 
-const state = { text: "", profile: null, jobs: [], ranked: [], sample: false, updated: null, shown: 20, filter: { verdict: "", city: "", type: "", q: "" } };
+const state = { text: "", profile: null, jobs: [], ranked: [], sample: false, updated: null, shown: 20, filter: { verdict: "", city: "", type: "", q: "", role: "" } };
 
 /* ---------- upload ---------- */
 const status = (msg, err = false) => { const s = $("#status"); s.textContent = msg; s.classList.toggle("err", err); };
@@ -167,9 +168,10 @@ const VERDICT = { eligible: "Eligible", check: "Check criteria", no: "Not eligib
 function jobCard(r) {
   const j = r.job;
   const posted = j.posted ? new Date(j.posted).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : null;
+  const fresh = j.posted && Date.now() - Date.parse(j.posted) < 7 * 864e5;
   return el("article", { class: `job ${r.verdict}-v` },
     el("div", { class: "job-top" },
-      el("div", {}, el("h3", {}, j.title), el("div", { class: "meta" }, el("strong", {}, j.company), el("span", {}, j.location), posted && el("span", {}, `Updated ${posted}`), el("span", {}, `Source: ${j.source}`))),
+      el("div", {}, el("h3", {}, fresh && el("span", { class: "new" }, "New"), j.title), el("div", { class: "meta" }, el("strong", {}, j.company), el("span", {}, j.location), posted && el("span", {}, `Updated ${posted}`), el("span", {}, `Source: ${j.source}`))),
       el("div", {}, el("span", { class: `stamp ${r.verdict}` }, VERDICT[r.verdict]), el("div", { class: "fit" }, `${r.score}% fit`, el("div", { class: "meter", "aria-hidden": "true" }, el("span", { style: `width:${r.score}%` }))))),
     el("div", { class: "chips" }, r.matched.map(s => el("span", { class: "chip have" }, `✓ ${s}`)), r.missing.slice(0, 6).map(s => el("span", { class: "chip miss" }, `Not on resume: ${s}`))),
     el("details", {}, el("summary", {}, "Eligibility check and job summary"),
@@ -177,7 +179,11 @@ function jobCard(r) {
       j.summary && el("p", {}, j.summary.length >= 320 ? `${j.summary}…` : j.summary)),
     el("div", { class: "actions" },
       state.sample ? el("span", { class: "stamp check" }, "Example only") : el("a", { class: "btn small", href: safeUrl(j.url), target: "_blank", rel: "noopener nofollow" }, "Apply on source site"),
-      el("button", { type: "button", class: "btn alt small", onclick: () => { selectTab("improve"); document.dispatchEvent(new CustomEvent("tailor", { detail: r })); } }, "Tailor my resume to this job")));
+      el("button", { type: "button", class: "btn alt small", onclick: () => { selectTab("improve"); document.dispatchEvent(new CustomEvent("tailor", { detail: r })); } }, "Tailor my resume to this job"),
+      !state.sample && el("button", { type: "button", class: `btn alt small save${isSaved(j.id) ? " on" : ""}`, "aria-pressed": String(isSaved(j.id)), onclick: e => {
+        const on = toggleSaved(j); e.currentTarget.classList.toggle("on", on); e.currentTarget.setAttribute("aria-pressed", String(on)); e.currentTarget.textContent = on ? "Saved ✓" : "Save";
+      } }, isSaved(j.id) ? "Saved ✓" : "Save"),
+      !state.sample && el("a", { class: "btn alt small", href: shareLink(j), target: "_blank", rel: "noopener" }, "Share on WhatsApp")));
 }
 
 function filtered() {
@@ -186,6 +192,7 @@ function filtered() {
     (!f.verdict || r.verdict === f.verdict) &&
     (!f.city || r.job.cities.includes(f.city)) &&
     (!f.type || (f.type === "intern") === r.job.criteria.internship) &&
+    (!f.role || r.job.roles.includes(f.role)) &&
     (!q || `${r.job.title} ${r.job.company}`.toLowerCase().includes(q)));
 }
 function render() {
@@ -208,9 +215,18 @@ function render() {
   $("#list").replaceChildren(...(list.length ? cards
     : [el("div", { class: "empty" }, el("h3", {}, "No jobs match these choices"), el("p", {}, "Clear a filter, add another kind of role, or open the More places to search tab."))]));
   $("#more").hidden = list.length <= state.shown;
+  // Specialisation chips: counts within the current verdict filter.
+  const roleCount = new Map();
+  for (const r of state.ranked) if (!state.filter.verdict || r.verdict === state.filter.verdict) for (const x of r.job.roles) roleCount.set(x, (roleCount.get(x) || 0) + 1);
+  const roles = [...roleCount].sort((a, b) => b[1] - a[1]);
+  $("#specbox").hidden = roles.length < 2;
+  $("#specchips").replaceChildren(
+    el("button", { type: "button", class: "chip", "aria-pressed": String(!state.filter.role), onclick: () => { state.filter.role = ""; state.shown = 20; render(); } }, "All"),
+    ...roles.map(([name, n]) => el("button", { type: "button", class: "chip", "aria-pressed": String(state.filter.role === name), onclick: () => { state.filter.role = state.filter.role === name ? "" : name; state.shown = 20; render(); } }, `${name} (${n})`)));
   const unlocks = skillUnlocks(state.ranked);
   $("#unlockbox").hidden = !unlocks.length;
-  $("#unlocks").replaceChildren(...unlocks.map(([s, n]) => el("li", {}, `${s}: asked in ${n} of your matches`)));
+  const learn = sk => `https://www.youtube.com/results?search_query=${encodeURIComponent(`${sk} full course for beginners`)}`;
+  $("#unlocks").replaceChildren(...unlocks.map(([sk, n]) => el("li", {}, el("b", {}, sk), ` asked in ${n} of your matches. `, el("a", { href: learn(sk), target: "_blank", rel: "noopener" }, "Learn free"))));
 }
 $("#more").addEventListener("click", () => { state.shown += 20; render(); });
 $("#f-city").addEventListener("change", e => { state.filter.city = e.target.value; render(); });

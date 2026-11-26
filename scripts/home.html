@@ -34,6 +34,11 @@
 </figure>
 </div></section>
 
+<section class="band saved" id="saved" hidden><div class="wrap">
+<div class="sec-head"><h2>Your saved jobs</h2><p>Saved on this device only. Update the status as you apply, so you always know where you stand.</p></div>
+<div id="savedlist"></div>
+</div></section>
+
 <div id="workspace" hidden>
 <section class="band"><div class="wrap">
 <div class="sec-head"><h2>Check what we read</h2><p>Correct anything that is wrong. Eligibility depends on these details.</p></div>
@@ -66,10 +71,11 @@
 <p id="freshness" style="margin-bottom:14px"></p>
 <div class="results">
 <aside class="filters" aria-label="Filter jobs">
+<div id="specbox"><span class="f"><b>Specialisation</b></span><div class="chips" id="specchips"></div></div>
 <div><label class="f" for="f-q">Role or company</label><input type="search" id="f-q"></div>
 <div><label class="f" for="f-city">City</label><select id="f-city"><option value="">All cities</option></select></div>
 <div><label class="f" for="f-type">Type</label><select id="f-type"><option value="">Jobs and internships</option><option value="intern">Internships</option><option value="job">Jobs</option></select></div>
-<div id="unlockbox"><h3>Skills that come up</h3><p>Asked in your matches but not on your resume.</p><ul id="unlocks" style="margin:8px 0 0 18px"></ul></div>
+<div id="unlockbox"><h3>Skills that come up</h3><p>Asked in your matches but not on your resume.</p><ul id="unlocks" class="unlocks"></ul></div>
 </aside>
 <div><div id="list" aria-live="polite"></div><button type="button" class="btn alt" id="more" hidden>Show more jobs</button></div>
 </div>
@@ -101,6 +107,12 @@
 <li><h3>Compare</h3><p>See each opening marked eligible, to be checked, or not yet eligible, with the reason.</p></li>
 <li><h3>Improve and apply</h3><p>Tailor your resume, then apply on the source site.</p></li>
 </ol>
+</div></section>
+
+<section class="band spec" id="specialisations"><div class="wrap">
+<div class="sec-head"><h2>Openings by specialisation</h2><p>Pick your field to see what is open right now. Upload your resume to see which of these you are eligible for.</p></div>
+<div class="spec-wrap"><div class="spec-tabs" role="tablist" aria-label="Specialisations">{{SPEC_TABS}}</div>
+<div class="spec-panels">{{SPEC_PANELS}}</div></div>
 </div></section>
 
 <section class="band employers"><div class="wrap">
