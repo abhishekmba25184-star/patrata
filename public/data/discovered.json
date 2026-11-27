@@ -199,5 +199,112 @@
  },
  "Zerodha": {
   "checked": "2026-11-27T09:34:12.355Z"
+ },
+ "Pine Labs": {
+  "checked": "2026-11-27T09:41:35.942Z"
+ },
+ "Angel One": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "INDmoney": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Jupiter Money": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Niyo": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "OneCard": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "KreditBee": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Kissht": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "MoneyView": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Indifi": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "FlexiLoans": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Mintifi": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Aye Finance": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Vivriti Capital": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Northern Arc": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Yubi": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Perfios": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Signzy": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "IDfy": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "M2P Fintech": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Acko": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Digit Insurance": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "InsuranceDekho": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "PolicyBazaar": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "RenewBuy": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "PharmEasy": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Practo": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "HealthifyMe": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Curefit": {
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Whatfix": {
+  "ats": "smartrecruiters",
+  "slug": "Whatfix",
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "HighRadius": {
+  "ats": "greenhouse",
+  "slug": "highradius",
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Tekion": {
+  "ats": "ashby",
+  "slug": "tekion",
+  "checked": "2026-11-27T09:41:35.943Z"
+ },
+ "Sigmoid": {
+  "ats": "greenhouse",
+  "slug": "sigmoid",
+  "checked": "2026-11-27T09:41:35.943Z"
  }
 }
