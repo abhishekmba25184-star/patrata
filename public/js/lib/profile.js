@@ -155,7 +155,11 @@ export function parseProfile(text, now = new Date()) {
   const fullTime = dateRanges(expText, now).filter(r => !r.intern && !internKeys.has(`${r.start}-${r.end}`));
   // A total the student wrote ("Work Experience: 13 months") wins over dates.
   const statedLine = clean.match(/(?:total|overall|full[- ]?time|work|professional)\s*(?:work\s*)?ex(?:perience|p\.?)?\b[^\n\d]{0,12}(\d{1,2}(?:\.\d{1,2})?)\s*\+?\s*(years?|yrs?|months?|mos?)\b(?:\s*(?:and\s*)?(\d{1,2})\s*(?:months?|mos?)\b)?/i);
-  const stated = sec.stated.experience ?? durationMonths(statedLine);
+  // Durations written next to each full-time role, e.g. "Jul 2022 - Aug 2023 (13 months)".
+  const ROLE_DUR = /\((\d{1,2}(?:\.\d{1,2})?)\s*\+?\s*(years?|yrs?|months?|mos?)\b(?:\s*(?:and\s*)?(\d{1,2})\s*(?:months?|mos?)\b)?\s*\)/i;
+  const roleLines = expText.split("\n").filter(l => ROLE_DUR.test(l) && !/\bintern(ship)?\b/i.test(l));
+  const perRole = roleLines.length && roleLines.length >= fullTime.length ? roleLines.reduce((n, l) => n + durationMonths(l.match(ROLE_DUR)), 0) : null;
+  const stated = sec.stated.experience ?? durationMonths(statedLine) ?? perRole;
   const experienceMonths = stated ?? totalMonths(fullTime);
   const experienceYears = Math.round((experienceMonths / 12) * 100) / 100;
   const internshipMonths = sec.stated.internship ?? totalMonths(internRanges);

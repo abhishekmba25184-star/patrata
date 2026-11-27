@@ -141,17 +141,24 @@ $("#find").addEventListener("click", async () => {
 });
 
 /* ---------- jobs ---------- */
-async function getJson(url) {
-  try { const r = await fetch(url); return r.ok ? await r.json() : null; } catch { return null; }
+// Every request gives up after a limit, so one slow source never freezes the page.
+async function getJson(url, ms = 15000) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ms);
+  try { const r = await fetch(url, { signal: ctl.signal }); return r.ok ? await r.json() : null; } catch { return null; } finally { clearTimeout(timer); }
 }
 async function loadJobs(p) {
   const city = p.cities[0] || "";
   const shard = r => (r ? r.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "other");
-  const [shards, live, community] = await Promise.all([
+  // Live job-site results can be slow; they are merged in when they arrive instead of holding up the page.
+  const liveReq = Promise.all(p.roles.slice(0, 3).map(r => getJson(`/api/jobs?${new URLSearchParams({ role: r, city, level: p.experienceYears < 1 ? "entry" : "any" })}`, 20000)));
+  const [shards, community] = await Promise.all([
     Promise.all([...p.roles, ""].map(r => getJson(`/data/jobs/${shard(r)}.json`))),
-    Promise.all(p.roles.slice(0, 3).map(r => getJson(`/api/jobs?${new URLSearchParams({ role: r, city, level: p.experienceYears < 1 ? "entry" : "any" })}`))),
-    document.getElementById("community") ? getJson("/api/community") : null
+    document.getElementById("community") ? getJson("/api/community", 6000) : null
   ]);
+  const live = [];
+  const quick = await Promise.race([liveReq, new Promise(res => setTimeout(() => res(null), 2500))]);
+  if (quick) live.push(...quick);
+  else liveReq.then(late => mergeLive(late, p));
   // Before the first daily refresh, the split files do not exist yet.
   const stored = shards.some(Boolean) ? { updated: shards.find(Boolean).updated, jobs: shards.flatMap(x => x?.jobs || []) } : await getJson("/data/jobs.json");
   let jobs = stored?.jobs || [];
@@ -164,6 +171,21 @@ async function loadJobs(p) {
   if (state.sample) jobs = ((await getJson("/data/sample-jobs.json"))?.jobs || []).map(normaliseJob);
   const seen = new Set();
   state.jobs = jobs.filter(j => { const k = `${j.company}|${j.title}|${j.location}`.toLowerCase(); return !seen.has(k) && seen.add(k); });
+}
+const jobKey = j => `${j.company}|${j.title}|${j.location}`.toLowerCase();
+// Late live results: add the new ones, re-rank, and keep the student's place and filters.
+function mergeLive(late, p) {
+  const extra = (late || []).flatMap(x => x?.jobs || []).map(normaliseJob);
+  if (!extra.length || state.sample) return;
+  const seen = new Set(state.jobs.map(jobKey));
+  const fresh = extra.filter(j => !seen.has(jobKey(j)) && seen.add(jobKey(j)));
+  if (!fresh.length) return;
+  state.jobs = state.jobs.concat(fresh);
+  state.liveCount = (state.liveCount || 0) + fresh.length;
+  state.ranked = rankJobs(state.profile || p, state.jobs);
+  render();
+  const note = $("#livenote");
+  if (note) note.textContent = `${fresh.length} more openings from job sites were just added.`;
 }
 
 const VERDICT = { eligible: "Eligible", check: "Check criteria", no: "Not eligible yet" };

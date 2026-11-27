@@ -195,7 +195,7 @@ await write("/", {
   desc: "Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.",
   body: home.replace("{{OPENINGS}}", fmt(highlights.openings)).replace("{{EMPLOYERS}}", fmt(highlights.employers)).replace("{{CITIES}}", fmt(highlights.cities))
     .replaceAll("{{MARQUEE}}", Object.entries(byEmployer).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([n, c]) => (COMPANY_PAGES.has(n) ? `<li><a href="${COMPANY_PAGES.get(n)}"><b>${esc(n)}</b><span>${fmt(c)} open</span></a></li>` : `<li><b>${esc(n)}</b><span>${fmt(c)} open</span></li>`)).join(""))
-    .replace("{{EMPLOYER_LIST}}", highlights.top.map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)}</span></li>`).join(""))
+    .replace("{{EMPLOYER_LIST}}", highlights.top.map(([n, c]) => COMPANY_PAGES.has(n) ? `<li><a href="${COMPANY_PAGES.get(n)}"><b>${esc(n)}</b><span>${fmt(c)}</span></a></li>` : `<li><b>${esc(n)}</b><span>${fmt(c)}</span></li>`).join("") + `<li class="all"><a href="/companies/"><b>All ${COMPANY_PAGES.size} companies</b></a></li>`)
     .replace(/<!--community-->[\s\S]*?<!--\/community-->/, cfg.community ? "$&" : "").replace("{{SPEC_TABS}}", specTabs).replace("{{SPEC_PANELS}}", specPanels).replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
   schema: [
     { "@context": "https://schema.org", "@type": "Organization", name: cfg.name, url: BASE, logo: `${BASE}/favicon.svg`, ...(hasEmail ? { email: cfg.email } : {}) },

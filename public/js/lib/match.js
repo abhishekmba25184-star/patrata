@@ -122,9 +122,28 @@ export function scoreJob(profile, job) {
 
 export function rankJobs(profile, jobs) {
   const order = { eligible: 0, check: 1, no: 2 };
-  return jobs.map(j => scoreJob(profile, j))
+  const sorted = jobs.map(j => scoreJob(profile, j))
     .filter(r => r.roleHit || r.matched.length >= 2)
     .sort((a, b) => order[a.verdict] - order[b.verdict] || b.score - a.score);
+  return spread(sorted);
+}
+
+// Within each verdict, a company's 4th opening onwards and repeats of the same title
+// (one role posted in many cities) move behind openings from other employers.
+export function spread(sorted, perCompany = 3) {
+  const out = [], byCo = new Map(), titles = new Set();
+  for (const v of ["eligible", "check", "no"]) {
+    const group = sorted.filter(r => r.verdict === v), first = [], later = [];
+    for (const r of group) {
+      const co = String(r.job.company).toLowerCase();
+      const t = `${co}|${String(r.job.title).toLowerCase().replace(/[^a-z]+/g, " ").replace(/\b(i{1,3}|iv)\b/g, "").trim()}`;
+      const n = byCo.get(co) || 0;
+      if (n >= perCompany || titles.has(t)) later.push(r);
+      else { first.push(r); byCo.set(co, n + 1); titles.add(t); }
+    }
+    out.push(...first, ...later);
+  }
+  return out;
 }
 
 // Which single skill would add the most matching, reachable openings.

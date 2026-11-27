@@ -39,7 +39,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // Time limits keep every run well inside GitHub's 90-minute cap, so results are always saved.
 const START = Date.now();
 const MIN = 60 * 1000;
-export const LIMITS = { discoverMinutes: +process.env.DISCOVER_MINUTES || 15, discoverBatch: 150, collectMinutes: +process.env.COLLECT_MINUTES || 55 };
+export const LIMITS = { discoverMinutes: +process.env.DISCOVER_MINUTES || 25, discoverBatch: 260, collectMinutes: +process.env.COLLECT_MINUTES || 55 };
 const pastCollectDeadline = () => Date.now() - START > LIMITS.collectMinutes * MIN;
 
 // Waits and tries again (briefly) when a site says "too many requests".
@@ -226,13 +226,17 @@ async function main() {
   const known = await readFile(new URL("public/data/discovered.json", root)).then(JSON.parse).catch(() => ({}));
   const listed = new Set(config.companies.map(c => c.name.toLowerCase()));
   const week = 7 * 864e5, now = Date.now();
-  const toProbe = (config.discover || []).filter(n => !listed.has(n.toLowerCase()) && !(known[n] && (known[n].ats || now - Date.parse(known[n].checked) < week)));
+  // Never-tried names first; a name left unsure last time waits behind them, so it cannot block the queue.
+  const toProbe = (config.discover || []).filter(n => !listed.has(n.toLowerCase()) && !(known[n] && (known[n].ats || now - Date.parse(known[n].checked) < week)))
+    .sort((a, b) => String(known[a]?.tried || "").localeCompare(String(known[b]?.tried || "")));
   // A batch per run, within a time limit; the rest are checked on later runs.
   const batch = toProbe.slice(0, LIMITS.discoverBatch), stopAt = Date.now() + LIMITS.discoverMinutes * MIN;
   const found = await pool(batch, 6, async n => ({ n, hit: await discover(n, stopAt) }));
   const done = found.filter(f => f && f.hit !== undefined);
   for (const { n, hit } of done) known[n] = hit ? { ats: hit.ats, slug: hit.slug, checked: new Date().toISOString() } : { checked: new Date().toISOString() };
-  console.log(`Discovery: checked ${done.length} of ${toProbe.length} waiting, found ${done.filter(f => f.hit).length}`);
+  const unsure = found.filter(f => f && f.hit === undefined);
+  for (const { n } of unsure) known[n] = { ...(known[n] || {}), tried: new Date().toISOString() };
+  console.log(`Discovery: checked ${done.length} of ${toProbe.length} waiting, found ${done.filter(f => f.hit).length}, ${unsure.length} to retry later`);
   const companies = [...config.companies, ...(config.discover || []).filter(n => !listed.has(n.toLowerCase()) && known[n]?.ats).map(n => ({ name: n, ats: known[n].ats, slug: known[n].slug }))];
   const previous = await readFile(new URL("public/data/jobs.json", root)).then(JSON.parse).catch(() => ({ jobs: [] }));
   const fresh = previous.updated && Date.now() - Date.parse(previous.updated) < 3 * 864e5;

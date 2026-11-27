@@ -60,15 +60,19 @@ export const CITY_ALIASES = {
 };
 
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const GENERIC = new Set(["Sales", "Marketing", "Operations", "Finance", "Recruitment", "Procurement", "Logistics", "Testing", "Consulting", "Accounting", "Audit", "Taxation", "Compliance", "Customer Service"]);
 const MATCHERS = Object.entries(SKILLS).map(([name, aliases]) => {
   // Short or ambiguous names are matched strictly.
   if (name === "R") return [name, [/\bR programming\b/i, /\bR ?Studio\b/i, /(?:^|[,|\/•(:]\s*)R(?=\s*(?:[,|\/•)]|$))/m, /\b(?:Python|SQL)\s*(?:,|and|&|\/)\s*R\b/]];
   if (name === "Go") return [name, [/\bgolang\b/i, /\bGo\b(?=\s*(?:,|\/|\)|lang))/]];
   if (name === "Leadership" || name === "Sales") {
     const words = [name, ...aliases];
-    return [name, words.map(w => new RegExp(`(?<![A-Za-z])${esc(w)}(?![A-Za-z])`, "i"))];
+    const notTeam = name === "Sales" ? "(?!\\s+(?:team|teams|department|dept|function|head|leadership|org|staff)\\b)" : "";
+    return [name, words.map(w => new RegExp(`(?<![A-Za-z])${esc(w)}(?![A-Za-z])${notTeam}`, "i"))];
   }
-  return [name, [name, ...aliases].map(w => new RegExp(`(?<![A-Za-z0-9+#])${esc(w)}(?![A-Za-z0-9+#])`, "i"))];
+  // "for the sales team" names a team, not a skill.
+  const notTeam = GENERIC.has(name) ? "(?!\\s+(?:team|teams|department|dept|function|head|leadership|org|organisation|organization|staff|colleagues)\\b)" : "";
+  return [name, [name, ...aliases].map(w => new RegExp(`(?<![A-Za-z0-9+#])${esc(w)}(?![A-Za-z0-9+#])${notTeam}`, "i"))];
 });
 
 export function findSkills(text) {
