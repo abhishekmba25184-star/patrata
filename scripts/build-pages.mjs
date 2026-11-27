@@ -44,7 +44,7 @@ ${schema.map(ld).join("\n")}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="logo" href="/"><span class="mark" aria-hidden="true"></span>${esc(cfg.name)}</a>
-<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">ATS score</a>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/companies/">Companies</a><a href="/resume-checker/">ATS score</a>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
 </div></header>
 <main id="main">
 ${body}
@@ -79,6 +79,11 @@ const cta = `<p><a class="btn" href="/#start">Check which jobs I am eligible for
 const jobsList = data.jobs || [];
 const byEmployer = {};
 for (const j of jobsList) byEmployer[j.company] = (byEmployer[j.company] || 0) + 1;
+// Company pages: one per employer with enough openings, plus a directory.
+const MIN_COMPANY_JOBS = 3;
+const coSlug = n => slugify(n) || "company";
+const COMPANY_PAGES = new Map(Object.entries(byEmployer).filter(([, n]) => n >= MIN_COMPANY_JOBS).map(([n]) => [n, `/companies/${coSlug(n)}/`]));
+const coLink = n => (COMPANY_PAGES.has(n) ? `<a href="${COMPANY_PAGES.get(n)}">${esc(n)}</a>` : esc(n));
 const SAMPLE = { degrees: ["mba", "bcom"], gradYear: 2027, cgpa: 7.5, cgpaUg: 7.5, cgpaPg: 7.5, experienceYears: 0, experienceMonths: 0, skills: ["Excel", "SQL", "PowerPoint", "Market Research", "Financial Modelling"], roles: [], cities: [] };
 const ENTRYISH = /\b(intern|analyst|associate|trainee|executive|graduate|junior|specialist|officer|coordinator)\b/i;
 const samples = jobsList
@@ -189,7 +194,7 @@ await write("/", {
   title: `${cfg.name}: Match your resume to jobs and check eligibility | Freshers India`,
   desc: "Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.",
   body: home.replace("{{OPENINGS}}", fmt(highlights.openings)).replace("{{EMPLOYERS}}", fmt(highlights.employers)).replace("{{CITIES}}", fmt(highlights.cities))
-    .replaceAll("{{MARQUEE}}", Object.entries(byEmployer).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)} open</span></li>`).join(""))
+    .replaceAll("{{MARQUEE}}", Object.entries(byEmployer).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([n, c]) => (COMPANY_PAGES.has(n) ? `<li><a href="${COMPANY_PAGES.get(n)}"><b>${esc(n)}</b><span>${fmt(c)} open</span></a></li>` : `<li><b>${esc(n)}</b><span>${fmt(c)} open</span></li>`)).join(""))
     .replace("{{EMPLOYER_LIST}}", highlights.top.map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)}</span></li>`).join(""))
     .replace(/<!--community-->[\s\S]*?<!--\/community-->/, cfg.community ? "$&" : "").replace("{{SPEC_TABS}}", specTabs).replace("{{SPEC_PANELS}}", specPanels).replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
   schema: [
@@ -205,7 +210,7 @@ await rm(new URL("public/jobs/", root), { recursive: true, force: true });
 const fresherFirst = (a, b) => (a.criteria.minExp ?? 1.5) - (b.criteria.minExp ?? 1.5) || String(b.posted).localeCompare(String(a.posted));
 const isSenior = j => /\b(senior|sr\.?|lead|head|director|principal|staff|vp|vice president)\b/i.test(j.title) || (j.criteria.minExp ?? 0) > 3;
 const updated = data.updated ? new Date(data.updated).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kolkata" }) : null;
-const jobTable = jobs => `<div style="overflow-x:auto"><table><thead><tr><th>Role</th><th>Company</th><th>Location</th><th>Experience asked</th></tr></thead><tbody>${jobs.map(j => `<tr><td><a href="${esc(/^https?:/.test(j.url) ? j.url : "#")}" rel="nofollow noopener" target="_blank">${esc(j.title)}</a></td><td>${esc(j.company)}</td><td>${esc(j.location)}</td><td>${j.criteria.internship ? "Internship" : j.criteria.minExp === null ? "Not stated" : `${j.criteria.minExp}+ years`}</td></tr>`).join("")}</tbody></table></div>`;
+const jobTable = jobs => `<div style="overflow-x:auto"><table><thead><tr><th>Role</th><th>Company</th><th>Location</th><th>Experience asked</th></tr></thead><tbody>${jobs.map(j => `<tr><td><a href="${esc(/^https?:/.test(j.url) ? j.url : "#")}" rel="nofollow noopener" target="_blank">${esc(j.title)}</a></td><td>${coLink(j.company)}</td><td>${esc(j.location)}</td><td>${j.criteria.internship ? "Internship" : j.criteria.minExp === null ? "Not stated" : `${j.criteria.minExp}+ years`}</td></tr>`).join("")}</tbody></table></div>`;
 const topSkills = jobs => { const m = new Map(); jobs.forEach(j => j.skills.forEach(s => m.set(s, (m.get(s) || 0) + 1))); return [...m].sort((a, b) => b[1] - a[1]).slice(0, 8); };
 const hub = [];
 
@@ -250,6 +255,75 @@ await write("/jobs/", {
   title: `Fresher jobs by role in India | ${cfg.name}`, desc: "Browse fresher and early career openings in India by role: software, data, finance, marketing, sales, product, consulting, operations, HR and design.",
   schema: [crumbs([["Jobs by role", "/jobs/"]])],
   body: `<div class="wrap article">${trail([["Jobs by role", "/jobs/"]])}<h1>Fresher jobs by role</h1><p>Pick a role to see who is eligible, what to show on your resume and which openings are listed now.</p><ul>${hub.map(([r, p, n]) => `<li><a href="${p}">${esc(r)} jobs</a>${n ? `: ${n} listed` : ""}</li>`).join("")}</ul>${cta}</div>`
+});
+
+// Company pages
+const careersPage = jobs => {
+  for (const j of jobs) {
+    let u; try { u = new URL(j.url); } catch { continue; }
+    if (/myworkday(jobs|site)\.com$/.test(u.host) && u.pathname.includes("/job/")) return u.origin + u.pathname.split("/job/")[0];
+    if (/greenhouse\.io$/.test(u.host) && /\/jobs\//.test(u.pathname)) return u.origin + u.pathname.split("/jobs/")[0];
+    if (/^(jobs\.lever\.co|jobs\.ashbyhq\.com|jobs\.smartrecruiters\.com|apply\.workable\.com)$/.test(u.host)) return `${u.origin}/${u.pathname.split("/")[1]}`;
+  }
+  return null;
+};
+const aboutText = (name, jobs) => {
+  for (const j of jobs) {
+    const m = String(j.summary || "").match(new RegExp(`^\\s*(about|who we are|about us)\\b[^:]{0,${name.length + 20}}:\\s*(.+)`, "i"));
+    if (!m) continue;
+    const sent = m[2].match(/[^.!?]+[.!?]+/g) || [];
+    const out = sent.slice(0, 2).join(" ").trim();
+    if (out.length > 60 && out.length < 380) return out;
+  }
+  return null;
+};
+const fieldsOf = jobs => { const m = new Map(); jobs.forEach(j => j.roles.forEach(r => m.set(r, (m.get(r) || 0) + 1))); return [...m].sort((a, b) => b[1] - a[1]); };
+const citiesOf = jobs => { const m = new Map(); jobs.forEach(j => j.cities.forEach(c => m.set(c, (m.get(c) || 0) + 1))); return [...m].sort((a, b) => b[1] - a[1]); };
+await rm(new URL("public/companies/", root), { recursive: true, force: true });
+const coCards = [];
+const coTable = jobs => `<div style="overflow-x:auto"><table><thead><tr><th>Role</th><th>Location</th><th>Experience asked</th><th>Posted</th></tr></thead><tbody>${jobs.map(j => `<tr><td><a href="${esc(/^https?:/.test(j.url) ? j.url : "#")}" rel="nofollow noopener" target="_blank">${esc(j.title)}</a></td><td>${esc(tidyPlace(j.location))}</td><td>${j.criteria.internship ? "Internship" : j.criteria.minExp === null ? "Not stated" : `${j.criteria.minExp}+ years`}</td><td>${ago(j.posted) || "Recently"}</td></tr>`).join("")}</tbody></table></div>`;
+for (const [name, path] of COMPANY_PAGES) {
+  const jobs = jobsList.filter(j => j.company === name).sort((a, b) => (a.criteria.minExp ?? 1.5) - (b.criteria.minExp ?? 1.5) || String(b.posted).localeCompare(String(a.posted)));
+  const entry = jobs.filter(j => !seniorTitle(j)), senior = jobs.filter(seniorTitle);
+  const fields = fieldsOf(jobs), cities = citiesOf(jobs).filter(([c]) => c !== "Remote"), skills = topSkills(jobs);
+  const careers = careersPage(jobs), about = aboutText(name, jobs);
+  coCards.push({ name, path, n: jobs.length, entry: entry.length, field: fields[0]?.[0] || "", city: cities[0]?.[0] || "" });
+  const list = [["Companies", "/companies/"], [name, path]];
+  const similar = [...COMPANY_PAGES].filter(([o]) => o !== name && fields[0] && jobsList.some(j => j.company === o && j.roles.includes(fields[0][0]))).slice(0, 8);
+  await write(path, {
+    title: `${name} jobs in India for freshers (${jobs.length} openings) | ${cfg.name}`,
+    desc: `${jobs.length} current ${name} openings in India, ${entry.length} open to freshers and early careers${cities[0] ? `, mostly in ${cities.slice(0, 2).map(c => c[0]).join(" and ")}` : ""}. See roles, skills asked and check your eligibility free.`,
+    schema: [crumbs(list)],
+    body: `<div class="wrap article co-page" style="max-width:1000px">${trail(list)}
+<h1>${esc(name)} jobs in India</h1>
+<p class="lead">${fmt(jobs.length)} openings at ${esc(name)} were listed on ${esc(updated || "the latest refresh")}, and ${fmt(entry.length)} of them are not senior roles.${cities.length ? ` Most are in ${esc(cities.slice(0, 3).map(([c, n]) => `${c} (${n})`).join(", "))}.` : ""}</p>
+<dl class="co-stats"><div><dt>Openings</dt><dd>${fmt(jobs.length)}</dd></div><div><dt>For freshers and early careers</dt><dd>${fmt(entry.length)}</dd></div><div><dt>Cities</dt><dd>${fmt(cities.length)}</dd></div><div><dt>Fields</dt><dd>${fmt(fields.length)}</dd></div></dl>
+${about ? `<blockquote class="co-about"><p>${esc(about)}</p><cite>From ${esc(name)}'s own job posts</cite></blockquote>` : ""}
+${fields.length ? `<h2>Openings by field</h2><ul class="co-fields">${fields.map(([f, n]) => `<li>${ROLE_PAGES[f] ? `<a href="/jobs/${ROLE_PAGES[f].slug}-jobs/">${esc(f)}</a>` : esc(f)}<b>${n}</b></li>`).join("")}</ul>` : ""}
+${skills.length ? `<h2>Skills ${esc(name)} asks for most</h2><p class="chips">${skills.map(([sk, n]) => `<span class="chip">${esc(sk)} <b>${n}</b></span>`).join("")}</p><p>Show the ones you have with a real example on your resume. The <a href="/resume-checker/">ATS score checker</a> shows which are missing for a specific posting.</p>` : ""}
+${cta}
+<h2>Roles for freshers and early careers</h2>${entry.length ? coTable(entry.slice(0, 50)) : `<p>No early-career roles at ${esc(name)} right now. Check back after the next refresh, which runs twice a day.</p>`}
+${senior.length ? `<h2>Experienced roles</h2><p>${senior.length} senior or manager-level ${senior.length === 1 ? "opening" : "openings"}, useful if you have several years of experience.</p>${coTable(senior.slice(0, 20))}` : ""}
+<h2>How to apply</h2><p>Every link above opens the posting on ${esc(name)}'s own careers site, where you apply directly. ${cfg.name} never charges for applications, and neither should anyone claiming to recruit for ${esc(name)}.${careers ? ` See all openings on <a href="${esc(careers)}" rel="nofollow noopener" target="_blank">${esc(name)}'s careers page</a>.` : ""}</p>
+${similar.length ? `<h2>Similar employers hiring now</h2><ul class="co-similar">${similar.map(([o, p]) => `<li><a href="${p}">${esc(o)} jobs</a></li>`).join("")}</ul>` : ""}
+</div>`
+  });
+}
+coCards.sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
+const letters = [...new Set(coCards.map(c => c.name[0].toUpperCase().replace(/[^A-Z]/, "#")))];
+await write("/companies/", {
+  title: `Companies hiring freshers in India right now (${coCards.length} employers) | ${cfg.name}`,
+  desc: `Browse ${coCards.length} companies with current openings in India, from ${coCards.slice().sort((a, b) => b.n - a.n).slice(0, 3).map(c => c.name).join(", ")} and more. See roles, cities and fresher-friendly openings for each.`,
+  schema: [crumbs([["Companies", "/companies/"]])],
+  script: `<script type="module" src="/js/companies.js"></script>`,
+  body: `<div class="wrap article" style="max-width:1100px">${trail([["Companies", "/companies/"]])}
+<h1>Companies hiring now</h1>
+<p class="lead">${coCards.length} employers with ${fmt(coCards.reduce((a, c) => a + c.n, 0))} current openings in India, taken from their own careers pages. Updated ${esc(updated || "twice a day")}.</p>
+<div class="co-tools"><label class="f" for="cofind">Find a company</label><input id="cofind" type="search" placeholder="Type a name, field or city" autocomplete="off"><p class="status" id="cocount" role="status"></p></div>
+<nav class="co-letters" aria-label="Jump to letter">${letters.map(l => `<a href="#co-${l === "#" ? "num" : l}">${l}</a>`).join("")}</nav>
+${letters.map(l => `<section class="co-group" id="co-${l === "#" ? "num" : l}"><h2>${l}</h2><ul class="co-grid">${coCards.filter(c => (c.name[0].toUpperCase().replace(/[^A-Z]/, "#")) === l).map(c => `<li data-q="${esc(`${c.name} ${c.field} ${c.city}`.toLowerCase())}"><a href="${c.path}"><b>${esc(c.name)}</b><span>${fmt(c.n)} openings${c.entry ? `, ${fmt(c.entry)} early-career` : ""}</span>${c.field ? `<span class="cf">${esc(c.field)}${c.city ? `, ${esc(c.city)}` : ""}</span>` : ""}</a></li>`).join("")}</ul></section>`).join("")}
+<p class="co-none" id="conone" hidden>No company matches that. Try a field like "Finance" or a city like "Pune".</p>
+${cta}</div>`
 });
 
 // Guides
