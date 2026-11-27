@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-27T09:48:32.430Z",
+ "updated": "2026-11-27T10:33:02.168Z",
  "sources": [
   {
    "name": "Groww",
@@ -161,7 +161,7 @@
    "name": "Zscaler",
    "ats": "greenhouse",
    "status": "ok",
-   "openings": 94
+   "openings": 93
   },
   {
    "name": "Celonis",
@@ -245,7 +245,7 @@
    "name": "Sarvam AI",
    "ats": "ashby",
    "status": "ok",
-   "openings": 38
+   "openings": 37
   },
   {
    "name": "Perplexity",
@@ -299,13 +299,13 @@
    "name": "ServiceNow",
    "ats": "smartrecruiters",
    "status": "ok",
-   "openings": 74
+   "openings": 75
   },
   {
    "name": "Freshworks",
    "ats": "smartrecruiters",
    "status": "ok",
-   "openings": 30
+   "openings": 31
   },
   {
    "name": "Publicis",
@@ -341,7 +341,7 @@
    "name": "NielsenIQ",
    "ats": "smartrecruiters",
    "status": "ok",
-   "openings": 79
+   "openings": 80
   },
   {
    "name": "Equinix",
@@ -470,6 +470,30 @@
    "openings": 38
   },
   {
+   "name": "Zeta Global",
+   "ats": "greenhouse",
+   "status": "ok",
+   "openings": 34
+  },
+  {
+   "name": "Shipsy",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 4
+  },
+  {
+   "name": "LogiNext",
+   "ats": "smartrecruiters",
+   "status": "ok",
+   "openings": 1
+  },
+  {
+   "name": "Zenoti",
+   "ats": "greenhouse",
+   "status": "ok",
+   "openings": 29
+  },
+  {
    "name": "Walmart",
    "ats": "workday",
    "status": "skip",
@@ -502,7 +526,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 403"
+   "error": "HTTP 429"
   },
   {
    "name": "Mastercard",
@@ -516,7 +540,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Intel",
@@ -577,8 +601,9 @@
   {
    "name": "Chevron",
    "ats": "workday",
-   "status": "ok",
-   "openings": 30
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "AstraZeneca",
@@ -632,8 +657,9 @@
   {
    "name": "Baker Hughes",
    "ats": "workday",
-   "status": "ok",
-   "openings": 31
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "State Street",
@@ -645,8 +671,9 @@
   {
    "name": "BlackRock",
    "ats": "workday",
-   "status": "ok",
-   "openings": 42
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Nasdaq",
@@ -672,9 +699,8 @@
   {
    "name": "Autodesk",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 1
   },
   {
    "name": "Diageo",
@@ -702,20 +728,21 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Lowe's",
    "ats": "workday",
    "status": "ok",
-   "openings": 35
+   "openings": 35,
+   "note": "kept from last run"
   },
   {
    "name": "Kenvue",
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Mondelez",
@@ -729,7 +756,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Deutsche Bank",
