@@ -473,5 +473,139 @@
   "ats": "greenhouse",
   "slug": "zenoti",
   "checked": "2026-11-27T10:27:52.812Z"
+ },
+ "Info Edge": {
+  "checked": "2026-11-27T17:57:18.055Z"
+ },
+ "ShareChat": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "VerSe Innovation": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Urban Company": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Wakefit": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Rebel Foods": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Chaayos": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Third Wave Coffee": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Blue Tokai": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Bira 91": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "FirstCry": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Mensa Brands": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "GlobalBees": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Good Glamm Group": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Epigamia": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Pocket Aces": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Zoho": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Chargebee": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Postman": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "BrowserStack": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Icertis": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Darwinbox": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "LeadSquared": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "MoEngage": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Netcore Cloud": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "WebEngage": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Gupshup": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Exotel": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Haptik": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Uniphore": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Sprinklr": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Hasura": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Zluri": {
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Datadog": {
+  "ats": "greenhouse",
+  "slug": "datadog",
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "New Relic": {
+  "ats": "greenhouse",
+  "slug": "newrelic",
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Snowflake": {
+  "ats": "ashby",
+  "slug": "snowflake",
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Redis": {
+  "ats": "ashby",
+  "slug": "redis",
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Pure Storage": {
+  "ats": "greenhouse",
+  "slug": "purestorage",
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Notion": {
+  "ats": "ashby",
+  "slug": "notion",
+  "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "Figma": {
+  "ats": "greenhouse",
+  "slug": "figma",
+  "checked": "2026-11-27T17:57:18.056Z"
  }
 }
