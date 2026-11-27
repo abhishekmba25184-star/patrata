@@ -607,5 +607,815 @@
   "ats": "greenhouse",
   "slug": "figma",
   "checked": "2026-11-27T17:57:18.056Z"
+ },
+ "CleverTap": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Yellow.ai": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Rocketlane": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Spendflo": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Sprinto": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Scrut Automation": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Leena AI": {
+  "ats": "workable",
+  "slug": "leena-ai",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Krutrim": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Fractal Analytics": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Tiger Analytics": {
+  "ats": "workable",
+  "slug": "tiger-analytics",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Mu Sigma": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "LatentView Analytics": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Tredence": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Course5 Intelligence": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Quantiphi": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Polestar Solutions": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Gramener": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "MathCo": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "WNS": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Firstsource": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Hexaware": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Mphasis": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "LTIMindtree": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Persistent Systems": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Coforge": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Zensar": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Birlasoft": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "KPIT": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Tata Elxsi": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Cyient": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Sasken": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Happiest Minds": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Mastek": {
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "LinkedIn": {
+  "ats": "lever",
+  "slug": "linkedin",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Spotify": {
+  "ats": "lever",
+  "slug": "spotify",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Duolingo": {
+  "ats": "greenhouse",
+  "slug": "duolingo",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Coursera": {
+  "ats": "greenhouse",
+  "slug": "coursera",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Airwallex": {
+  "ats": "ashby",
+  "slug": "airwallex",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Thoughtworks": {
+  "ats": "ashby",
+  "slug": "thoughtworks",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Flexport": {
+  "ats": "greenhouse",
+  "slug": "flexport",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Continental": {
+  "ats": "smartrecruiters",
+  "slug": "Continental",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Scale AI": {
+  "ats": "greenhouse",
+  "slug": "scaleai",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "UiPath": {
+  "ats": "ashby",
+  "slug": "uipath",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Smartsheet": {
+  "ats": "greenhouse",
+  "slug": "smartsheet",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Wrike": {
+  "ats": "greenhouse",
+  "slug": "wrike",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Zapier": {
+  "ats": "ashby",
+  "slug": "zapier",
+  "checked": "2026-11-27T18:06:20.902Z"
+ },
+ "Intellect Design Arena": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Nucleus Software": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Newgen Software": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Ramco Systems": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Tally Solutions": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Affle": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Capillary Technologies": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Unicommerce": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Increff": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "FarEye": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Vymo": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Mswipe": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Kissflow": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Facilio": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Wingify": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Multiplier": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Skuad": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Oyster HR": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Keka": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Zimyo": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Springworks": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Vantage Circle": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Fyle": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Volopay": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "EnKash": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Open Financial Technologies": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Innovaccer": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Lentra": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Kotak811": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Google": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Microsoft": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Amazon": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Meta": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Apple": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Netflix": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Oracle": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "SAP": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "IBM": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Cisco": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Qualcomm": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "AMD": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Texas Instruments": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Samsung": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Uber": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Lyft": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Booking.com": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Expedia": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "MakeMyTrip": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Atlassian": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Intuit": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "PayPal": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "American Express": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Wayfair": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "eBay": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Etsy": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Shopify": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Robinhood": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Plaid": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Palo Alto Networks": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "CrowdStrike": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Fortinet": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Check Point": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Akamai": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Splunk": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Confluent": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Couchbase": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Cohesity": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Nutanix": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "VMware": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "NetApp": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Zendesk": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "HubSpot": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "DocuSign": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Zoom": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Asana": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Canva": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Miro": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "GitHub": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "JetBrains": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Grammarly": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Udemy": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Chegg": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Toptal": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Rippling": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Gusto": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Brex": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Chime": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "SoFi": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Affirm": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Klarna": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Revolut": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "EPAM": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Globant": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Publicis Sapient": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Nagarro": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Indeed": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Glassdoor": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Procore": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Siemens": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Honeywell": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "ABB": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Schneider Electric": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "GE Aerospace": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Rolls-Royce": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Airbus": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Caterpillar": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Cummins": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "John Deere": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Volvo Group": {
+  "tried": "2026-11-27T18:06:20.902Z"
+ },
+ "Mercedes-Benz Research and Development India": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "ZF Group": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Valeo": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Visteon": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Harman": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Aptiv": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Hugging Face": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Mistral AI": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Automation Anywhere": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Gojek": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Careem": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Talabat": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Delivery Hero": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Swiggy Instamart": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Zalando": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Trivago": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Tripadvisor": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Skyscanner": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Ola Cabs": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Calendly": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Loom": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Monday.com": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "ClickUp": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Airtable": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Webflow": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Hostinger": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Wix": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Squarespace": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Unity": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Epic Games": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Riot Games": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Ubisoft": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Electronic Arts": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Activision Blizzard": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Zynga": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Kraft Heinz": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Goldman Sachs": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Morgan Stanley": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "JPMorgan Chase": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Citi": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Barclays": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "HSBC": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Standard Chartered": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "UBS": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "BNP Paribas": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Societe Generale": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Bank of America": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "BNY": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Northern Trust": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Fidelity International": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Invesco": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Franklin Templeton": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Schroders": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Nomura": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Mizuho": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "MUFG": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Natixis": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Macquarie": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "NatWest": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Lloyds Banking Group": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Synchrony": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Discover Financial": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Capital One": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Ameriprise": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Principal Global Services": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Prudential": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Manulife": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Sun Life": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "MetLife": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Allianz": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "AXA": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Swiss Re": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Munich Re": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Chubb": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Aon": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "WTW": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Gallagher": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Moody's": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "S&P Global": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Fitch Ratings": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "CRISIL": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "ICRA": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "MSCI": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Morningstar": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "FactSet": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Bloomberg": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Broadridge": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Fiserv": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Global Payments": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Worldline": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Euronet": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "NPCI": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "HDFC Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "ICICI Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Axis Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Kotak Mahindra Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "IndusInd Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Yes Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "IDFC First Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "RBL Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Federal Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "AU Small Finance Bank": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Bajaj Finance": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Bajaj Finserv": {
+  "tried": "2026-11-27T18:06:20.903Z"
+ },
+ "Tata Capital": {
+  "tried": "2026-11-27T18:06:20.903Z"
  }
 }
