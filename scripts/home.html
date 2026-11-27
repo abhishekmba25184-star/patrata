@@ -75,6 +75,8 @@
 <section class="band" id="output" hidden><div class="wrap">
 <div class="tabs" role="tablist">
 <button type="button" role="tab" data-tab="jobs" aria-selected="true">Matching jobs</button>
+<button type="button" role="tab" data-tab="prepare" aria-selected="false">Prepare for a job</button>
+<button type="button" role="tab" data-tab="builder" aria-selected="false">Resume builder</button>
 <button type="button" role="tab" data-tab="improve" aria-selected="false">Improve resume</button>
 <button type="button" role="tab" data-tab="post" aria-selected="false">Check a job post</button>
 <button type="button" role="tab" data-tab="portals" aria-selected="false">More places to search</button>
@@ -95,6 +97,19 @@
 <div><div id="list" aria-live="polite"></div><button type="button" class="btn alt" id="more" hidden>Show more jobs</button></div>
 </div>
 </div>
+
+<div data-panel="prepare" hidden>
+<div class="panel prep-pick">
+<label class="f" for="prepsel">Job</label><select id="prepsel"></select>
+<div id="prepcustom" hidden><div class="grid2"><label class="f">Job title<input type="text" id="prep-title" placeholder="Business Analyst"></label><label class="f">Company<input type="text" id="prep-company" placeholder="Company name"></label></div></div>
+<label class="f" for="prepjd">Job description</label><textarea id="prepjd" rows="5" placeholder="Paste the full job description from the company's page for the best result"></textarea>
+<div id="prepnow" class="prepnow"></div>
+</div>
+<div class="prep-switch" role="tablist" aria-label="Preparation tools"><button type="button" role="tab" data-sub="kit" aria-selected="true">Cover letter, emails and referral</button><button type="button" role="tab" data-sub="interview" aria-selected="false">Mock interview</button></div>
+<div id="kitroot"></div><div id="ivroot" hidden></div>
+</div>
+
+<div data-panel="builder" hidden><div id="builderroot"></div></div>
 
 <div data-panel="improve" hidden>
 <div class="two">

@@ -96,22 +96,40 @@ export function buildLines(text, summary, accepted) {
   return lines;
 }
 
+const GAP = /\[[^\]\n]{2,40}\]/;
+const GAPS = /(\[[^\]\n]{2,40}\])/;
+// Every accepted suggestion goes into the Word file. Gaps such as [add figure] are highlighted
+// in yellow, and the next steps go on a last page, so the student finishes the edit in Word.
 async function download() {
-  const pending = [$("#summary").value, ...edits.filter(e => e.use).map(e => e.improved)].some(s => s.includes("[add figure]"));
-  if (pending) { $("#dlmsg").textContent = 'Replace every "[add figure]" with a true number, or delete it, before downloading.'; return; }
-  await loadScript("/vendor/docx.umd.js");
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
-  const lines = buildLines(getState().text, $("#summary").value, edits);
+  const box = $("#dlmsg");
+  box.textContent = "Preparing your Word file…";
+  try { await loadScript("/vendor/docx.umd.js"); } catch (e) { box.textContent = e.message; return; }
+  const { Document, Packer, Paragraph, TextRun, HeadingLevel, PageBreak } = window.docx;
+  const summary = $("#summary").value;
+  const lines = buildLines(getState().text, summary, edits);
+  const advice = [...document.querySelectorAll("#advice li")].map(li => li.textContent.trim()).filter(Boolean);
+  const runs = (text, o = {}) => String(text).split(GAPS).filter(Boolean).map(part => new TextRun({ text: part, ...o, ...(GAP.test(part) ? { highlight: "yellow", bold: true } : {}) }));
   const heading = /^(summary|profile|objective|education|academics?|experience|work experience|professional experience|internships?|projects|skills|technical skills|certifications?|achievements?|positions? of responsibility|extra.?curriculars?( activities)?)\s*:?$/i;
+  const body = lines.map((l, i) => i === 0 ? new Paragraph({ children: runs(l, { bold: true, size: 32 }) })
+    : heading.test(l) ? new Paragraph({ children: runs(l.replace(/:$/, "")), heading: HeadingLevel.HEADING_2 })
+    : /^[•▪●◦‣∙·\-–*]\s*/.test(l) ? new Paragraph({ children: runs(l.replace(/^[•▪●◦‣∙·\-–*]\s*/, "")), bullet: { level: 0 } })
+    : new Paragraph({ children: runs(l) }));
+  const gaps = lines.filter(l => GAP.test(l));
+  const notes = [
+    new Paragraph({ children: [new PageBreak()] }),
+    new Paragraph({ text: "Notes to finish your resume (delete this page before sending)", heading: HeadingLevel.HEADING_2 }),
+    new Paragraph({ text: "The AI suggestions are already in your resume above. Read every line and keep only what is true." }),
+    ...(gaps.length ? [new Paragraph({ children: [new TextRun({ text: `${gaps.length} ${gaps.length === 1 ? "line has" : "lines have"} a gap highlighted in yellow. Replace each with a true detail, or delete it:`, bold: true })] }),
+      ...gaps.map(l => new Paragraph({ children: runs(l.replace(/^[•▪●◦‣∙·\-–*]\s*/, "")), bullet: { level: 0 } }))] : []),
+    ...(advice.length ? [new Paragraph({ children: [new TextRun({ text: "Next steps", bold: true })], spacing: { before: 200 } }), ...advice.map(a => new Paragraph({ text: a, bullet: { level: 0 } }))] : [])
+  ];
   const doc = new Document({
-    styles: { default: { document: { run: { font: "Calibri", size: 21 } }, heading2: { run: { font: "Calibri", size: 24, bold: true, color: "14262B" }, paragraph: { spacing: { before: 200, after: 80 } } } } },
-    sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 720, bottom: 720, left: 720, right: 720 } } },
-      children: lines.map((l, i) => i === 0 ? new Paragraph({ children: [new TextRun({ text: l, bold: true, size: 32 })] })
-        : heading.test(l) ? new Paragraph({ text: l.replace(/:$/, ""), heading: HeadingLevel.HEADING_2 })
-        : /^[•▪●◦‣∙·\-–*]\s*/.test(l) ? new Paragraph({ text: l.replace(/^[•▪●◦‣∙·\-–*]\s*/, ""), bullet: { level: 0 } })
-        : new Paragraph({ text: l })) }]
+    styles: { default: { document: { run: { font: "Calibri", size: 21 } }, heading2: { run: { font: "Calibri", size: 24, bold: true, color: "1F3FA8" }, paragraph: { spacing: { before: 200, after: 80 } } } } },
+    sections: [{ properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 720, bottom: 720, left: 720, right: 720 } } }, children: [...body, ...notes] }]
   });
   const a = el("a", { href: URL.createObjectURL(await Packer.toBlob(doc)), download: "resume-improved.docx" });
   document.body.append(a); a.click(); a.remove();
-  $("#dlmsg").textContent = "Downloaded. Open it in Word or Google Docs and tidy the layout.";
+  box.textContent = gaps.length
+    ? `Downloaded. ${gaps.length} ${gaps.length === 1 ? "gap is" : "gaps are"} highlighted in yellow for you to fill in, and the last page lists your next steps. Delete that page before sending.`
+    : "Downloaded. The last page lists your next steps; delete it before sending.";
 }

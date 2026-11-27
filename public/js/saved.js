@@ -36,3 +36,14 @@ function render() {
 document.addEventListener("saved-change", render);
 addEventListener("storage", render);
 render();
+
+// On phones the menu scrolls sideways, so the tools list opens below the header instead.
+const tools = document.querySelector(".navtools");
+if (tools) {
+  tools.addEventListener("toggle", () => {
+    const h = document.querySelector("header.top");
+    if (h) document.documentElement.style.setProperty("--navbottom", `${Math.round(h.getBoundingClientRect().bottom) + 6}px`);
+  });
+  document.addEventListener("click", e => { if (tools.open && !tools.contains(e.target)) tools.open = false; });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && tools.open) { tools.open = false; tools.querySelector("summary").focus(); } });
+}

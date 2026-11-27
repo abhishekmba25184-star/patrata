@@ -3,6 +3,7 @@ import { rankJobs, normaliseJob, skillUnlocks, scoreJob } from "./lib/match.js";
 import { SKILLS, ROLE_FAMILIES, CITIES, findSkills } from "./lib/skills.js";
 import { readResume } from "./reader.js";
 import { initImprove, refreshImprove } from "./improve.js";
+import { initTools, refreshTools, prepareFor } from "./tools/home-tools.js";
 import { portalLinks } from "./portals.js";
 import { isSaved, toggleSaved, shareLink } from "./lib/store.js";
 
@@ -40,6 +41,7 @@ const wait = ms => new Promise(r => setTimeout(r, still ? 0 : ms));
 async function useText(text) {
   state.text = joinWrapped(text);
   const p = state.profile = parseProfile(state.text);
+  try { sessionStorage.setItem("patrata:text", state.text); } catch {}
   const label = id => DEGREES.find(d => d.id === id)?.label || id;
   const months = p.experienceMonths || 0;
   const lines = [
@@ -136,7 +138,7 @@ $("#find").addEventListener("click", async () => {
   btn.disabled = false; btn.textContent = "Show my matching jobs";
   $("#output").hidden = false;
   state.fresh = true;
-  render(); renderPortals(); refreshImprove();
+  render(); renderPortals(); refreshImprove(); refreshTools();
   $("#output").scrollIntoView();
 });
 
@@ -204,7 +206,8 @@ function jobCard(r) {
       j.summary && el("p", {}, j.summary.length >= 320 ? `${j.summary}…` : j.summary)),
     el("div", { class: "actions" },
       state.sample ? el("span", { class: "stamp check" }, "Example only") : el("a", { class: "btn small", href: safeUrl(j.url), target: "_blank", rel: "noopener nofollow" }, "Apply on source site"),
-      el("button", { type: "button", class: "btn alt small", onclick: () => { selectTab("improve"); document.dispatchEvent(new CustomEvent("tailor", { detail: r })); } }, "Tailor my resume to this job"),
+      el("button", { type: "button", class: "btn alt small", onclick: () => prepareFor(j, "kit") }, "Prepare for this job"),
+      el("button", { type: "button", class: "btn alt small", onclick: () => { selectTab("improve"); document.dispatchEvent(new CustomEvent("tailor", { detail: r })); } }, "Tailor my resume"),
       !state.sample && el("button", { type: "button", class: `btn alt small save${isSaved(j.id) ? " on" : ""}`, "aria-pressed": String(isSaved(j.id)), onclick: e => {
         const on = toggleSaved(j); e.currentTarget.classList.toggle("on", on); e.currentTarget.setAttribute("aria-pressed", String(on)); e.currentTarget.textContent = on ? "Saved ✓" : "Save";
       } }, isSaved(j.id) ? "Saved ✓" : "Save"),
@@ -274,6 +277,8 @@ $$(".tabs button").forEach(b => b.addEventListener("click", () => selectTab(b.da
 for (const id of ["#p-city", "#f-city"]) $(id).append(...CITIES.map(c => el("option", { value: c }, c)));
 $("#skilllist").append(...Object.keys(SKILLS).map(s => el("option", { value: s })));
 initImprove(() => state);
+initTools(() => state);
+document.addEventListener("tab", e => { selectTab(e.detail); $("#output").scrollIntoView(); });
 
 /* ---------- check a pasted job post ---------- */
 // Reads criteria from any pasted post and compares them with the student's details.

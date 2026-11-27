@@ -17,7 +17,7 @@ export const DEGREES = [
   { id: "ca", label: "CA", level: "pro", re: /\bchartered accountan(t|cy)\b|\bCA (final|inter|intermediate)\b/i }
 ];
 
-const HEADING = /^\s*(education(al)?( qualifications?| details| background)?|academics?|academic (qualifications?|background|details|profile)|scholastic (achievements|record)|work ex(perience)?|professional experience|corporate experience|industry experience|full.?time experience|relevant experience|experience|employment( history)?|internships?( experience)?|summer internships?( project)?|projects?|skills|technical skills|key skills|certifications?|achievements?|awards?|positions? of responsibility|extra.?curriculars?( activities)?|activities|summary|profile|objective|publications?|interests|languages)\s*:?\s*$/i;
+export const HEADING = /^\s*(education(al)?( qualifications?| details| background)?|academics?|academic (qualifications?|background|details|profile)|scholastic (achievements|record)|work ex(perience)?|professional experience|corporate experience|industry experience|full.?time experience|relevant experience|experience|employment( history)?|internships?( experience)?|summer internships?( project)?|projects?|skills|technical skills|key skills|certifications?|achievements?|awards?|positions? of responsibility|extra.?curriculars?( activities)?|activities|summary|profile|objective|publications?|interests|languages)\s*:?\s*$/i;
 
 // PDF text breaks long points over several lines. Join them back together.
 export function joinWrapped(text) {

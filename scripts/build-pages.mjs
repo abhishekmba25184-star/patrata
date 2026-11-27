@@ -44,7 +44,7 @@ ${schema.map(ld).join("\n")}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="logo" href="/"><span class="mark" aria-hidden="true"></span>${esc(cfg.name)}</a>
-<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/companies/">Companies</a><a href="/resume-checker/">ATS score</a>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/companies/">Companies</a><details class="navtools"><summary>Free tools</summary><div><a href="/resume-builder/">Resume builder</a><a href="/resume-checker/">ATS score checker</a><a href="/cover-letter-generator/">Cover letter and HR email</a><a href="/mock-interview/">AI mock interview</a></div></details>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
 </div></header>
 <main id="main">
 ${body}
@@ -53,6 +53,7 @@ ${body}
 <div class="cols">
 <div><h2>${esc(cfg.name)}</h2><p>Resume-based job matching for students and freshers across India. Applications happen on the employer's or job site's own page.</p></div>
 <div><h2>Jobs by role</h2><ul>${Object.values(ROLE_PAGES).slice(0, 6).map(r => `<li><a href="/jobs/${r.slug}-jobs/">${esc(r.slug.replace(/-/g, " "))} jobs</a></li>`).join("")}</ul></div>
+<div><h2>Free tools</h2><ul><li><a href="/resume-builder/">Resume builder</a></li><li><a href="/resume-checker/">ATS score checker</a></li><li><a href="/cover-letter-generator/">Cover letter and HR email</a></li><li><a href="/mock-interview/">AI mock interview</a></li></ul></div>
 <div><h2>Guides</h2><ul>${GUIDES.map(g => `<li><a href="/guides/${g.slug}/">${esc(g.title.split(":")[0])}</a></li>`).join("")}</ul></div>
 <div><h2>About</h2><ul><li><a href="/about/">About us</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/terms/">Terms of use</a></li>${/example\.com$/.test(cfg.email) ? "" : `<li><a href="mailto:${esc(cfg.email)}">Contact</a></li>`}</ul></div>
 </div>
@@ -379,6 +380,73 @@ await write("/resume-checker/", { title: `Free ATS resume score checker for stud
 ${ATS_FAQ.map(([q, a]) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join("")}
 <p>Read the <a href="/guides/ats-resume-for-freshers/">ATS resume guide for freshers</a>.</p></div>` });
 
+// Free tool pages: the same tools as on the home page, with their own resume and job boxes.
+const TOOL_PAGES = [
+  { path: "/resume-builder/", tool: "builder", name: "Resume builder",
+    title: `Free resume builder for freshers and MBA students, ATS friendly | ${cfg.name}`,
+    desc: "Build a one-page, ATS-friendly resume in minutes. Start from your old resume, pick a template, improve points with AI, check your ATS score live and download PDF or Word. Free.",
+    h1: "Free resume builder", lead: "Start from your current resume or a blank page. Edit clean sections, pick a template that tracking software reads correctly, watch the ATS score and the one-page check as you type, and download PDF or Word.",
+    jobOptional: true,
+    faq: [["Is the resume builder free?", "Yes. Building, downloading PDF and Word files, and the ATS score are all free. The AI rewrite buttons are free too, within a daily limit."],
+      ["Are these templates ATS friendly?", "Yes. All three use one column, standard headings and real text, which applicant tracking software reads in the right order. They avoid tables, icons and text boxes."],
+      ["Where is my resume saved?", "Only in this browser on this device, so you can come back and continue. It is not uploaded to our server."],
+      ["How do I save it as a PDF?", "Select Download PDF, then choose Save as PDF in the print window. The text stays selectable, which matters for ATS software."]] },
+  { path: "/cover-letter-generator/", tool: "kit", name: "Cover letter and HR email writer",
+    title: `Free AI cover letter, HR email and referral message writer | ${cfg.name}`,
+    desc: "Write a cover letter, an email to HR, a LinkedIn note and a referral request for any job, from your own resume. Built for freshers and MBA students in India. Free.",
+    h1: "Cover letter, HR email and referral writer", lead: "Add your resume and the job. Get a cover letter, an email to HR you can open in your mail app, LinkedIn notes for recruiters, a referral request with alumni search links, and a follow-up email. Everything is editable.",
+    faq: [["Will the AI make things up?", "It is told to use only what your resume says. Where a number would help but is missing, it leaves a gap in [brackets] for you to fill in, and any figure that is not in your resume or the job post is replaced with a gap."],
+      ["Is my name or phone number sent to the AI?", "No. Your name, email, phone number and links are removed in your browser first, and put back into the letter on your device."],
+      ["How does the referral finder work?", "It opens LinkedIn and Google searches for people at the company, starting with alumni of your college, and writes a short, polite referral request you can copy."],
+      ["Can I send the email directly?", "Select Open in my email app to start the email with the subject and text filled in. Attach your resume there yourself."]] },
+  { path: "/mock-interview/", tool: "interview", name: "AI mock interview",
+    title: `Free AI mock interview for placements, with scores and feedback | ${cfg.name}`,
+    desc: "Practise a mock interview built from your resume and the job. Answer by typing or speaking, and get a score, what worked, what was missing and a stronger answer for every question. Free.",
+    h1: "AI mock interview", lead: "An AI interviewer asks questions built from the job and your own resume, like a real panel would. Answer by typing or speaking. After each answer you get a score out of 10, what worked, what was missing and a stronger model answer.",
+    faq: [["Can I answer by speaking?", "Yes, in Chrome and Edge on a computer or Android phone. Select Answer by speaking and allow the microphone; your words appear in the answer box, and you can correct them before submitting."],
+      ["What kinds of interviews can I practise?", "Mixed, HR and behavioural, role and technical, a resume deep-dive, or case and guesstimate questions, at fresher, experienced or internship level."],
+      ["How is my answer scored?", "On structure, relevance to the question, specific evidence and clarity, from 0 to 10. A stronger answer is written only from facts in your resume and your answer."],
+      ["Are my answers saved?", "Only your recent scores are kept in this browser so you can track progress. Answers are not stored on our server."]] }
+];
+for (const t of TOOL_PAGES) {
+  const list = [[t.name, t.path]];
+  await write(t.path, {
+    title: t.title, desc: t.desc,
+    schema: [crumbs(list), { "@context": "https://schema.org", "@type": "WebApplication", name: `${cfg.name} ${t.name}`, url: `${BASE}${t.path}`, applicationCategory: "BusinessApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "INR" } }, faq(t.faq)],
+    script: `<script type="module" src="/js/toolpage.js"></script>`,
+    body: `<section class="ats-top tool-top"><div class="wrap">${trail(list)}
+<h1>${esc(t.h1)}</h1><p class="lead">${esc(t.lead)}</p>
+<div class="tool-shell" data-tool="${t.tool}">
+<div class="shell-inputs${t.jobOptional ? " one" : ""}">
+<div class="shell-card">
+<h2><span class="num">1</span>Your resume${t.jobOptional ? " (optional)" : ""}</h2>
+<p class="have" id="sh-have" hidden>Using <b></b>. <button type="button" class="linkbtn" id="sh-change">Use a different resume</button></p>
+<div id="sh-input" class="drop">
+<p>PDF, Word or text. It is read on your device and is not stored.</p>
+<label class="consent" id="sh-consent"><input type="checkbox" id="sh-agree"><span>I am 18 or older and I agree to the <a href="/terms/">terms</a> and <a href="/privacy/">privacy notice</a>.</span></label>
+<div class="row"><button type="button" class="btn" id="sh-pick">Choose resume file</button><button type="button" class="btn alt" id="sh-pastebtn">Paste text instead</button></div>
+<input type="file" id="sh-file" accept=".pdf,.docx,.txt" hidden>
+<div id="sh-pastebox" hidden><label class="f" for="sh-text">Resume text</label><textarea id="sh-text" rows="6"></textarea><button type="button" class="btn small" id="sh-usetext">Use this text</button></div>
+</div>
+<p class="status" id="sh-msg" role="status"></p>
+</div>
+${t.jobOptional ? "" : `<div class="shell-card">
+<h2><span class="num">2</span>The job</h2>
+<div class="grid2"><label class="f">Job title<input type="text" id="sh-title" placeholder="Business Analyst"></label><label class="f">Company<input type="text" id="sh-company" placeholder="Company name"></label></div>
+<label class="f" for="sh-jd">Job description</label><textarea id="sh-jd" rows="6" placeholder="Paste the full job description from the company's page"></textarea>
+<p class="hint">No job yet? <a href="/#start">Find jobs that match your resume</a>, then use Prepare for this job.</p>
+</div>`}
+</div>
+<div id="toolroot" class="toolroot"></div>
+</div></div></section>
+<div class="wrap article">
+<h2>Questions about the ${esc(t.name.toLowerCase())}</h2>
+${t.faq.map(([q, a]) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join("")}
+<p>More free tools: ${TOOL_PAGES.filter(o => o !== t).map(o => `<a href="${o.path}">${esc(o.name.toLowerCase())}</a>`).join(", ")} and the <a href="/resume-checker/">ATS score checker</a>.</p>
+</div>`
+  });
+}
+
 await write("/about/", { title: `About ${cfg.name}`, desc: `Why ${cfg.name} was built for students and freshers in India.`,
   body: `<div class="wrap article"><h1>About ${esc(cfg.name)}</h1><p>Students often apply to openings they are not eligible for and miss the ones they are. ${esc(cfg.name)} reads your resume, compares it with the conditions written in each job post and shows the result openly, so you can spend your effort where it counts.</p><h2>How we work</h2><ul><li>Every listing links to its source, where you apply.</li><li>We do not charge students to apply.</li><li>The AI is instructed never to invent experience, and you approve each change.</li></ul><h2>Contact</h2><p>${mail}</p></div>` });
 
@@ -386,7 +454,7 @@ await write("/privacy/", { title: `Privacy notice | ${cfg.name}`, desc: "What ha
   body: `<div class="wrap article"><h1>Privacy notice</h1><p>This notice explains what ${esc(cfg.owner)} does with your information. Contact: ${mail}.</p>
 <h2>Your resume</h2><p>The file is read inside your browser. We do not upload or save it, and we run no accounts or resume database. Closing the page clears it.</p>
 <h2>Job search</h2><p>When live search is on, our server receives the role type, city and experience level you chose, and passes a search phrase to the job search providers we use (Careerjet and OpenWeb Ninja JSearch). Careerjet also requires your IP address and browser type with each search. Your resume is not sent.</p>
-<h2>AI rewrite</h2><p>Only if you tick the consent box and press the button, resume text and any job description you pasted go through our server to Google's Gemini API. The software first removes email addresses, phone numbers, links, your detected name and some personal lines. Automatic removal can miss details, so delete anything private before using it. Depending on the plan used, Google may keep this text, have people review it and use it to improve its services. See Google's Gemini API terms.</p>
+<h2>AI features</h2><p>The AI rewrite, the resume builder's AI buttons, the cover letter and email writer and the mock interview work only if you tick the AI consent box and press a button. Then your resume text, the job description, and for the mock interview your questions and answers, go through our server to Google's Gemini API. Your name and contact details are put back into letters on your own device. The software first removes email addresses, phone numbers, links, your detected name and some personal lines. Automatic removal can miss details, so delete anything private before using it. Depending on the plan used, Google may keep this text, have people review it and use it to improve its services. See Google's Gemini API terms.</p><h2>Saved on your device</h2><p>The resume builder keeps your draft, and the mock interview keeps your recent scores, in your browser's storage on this device so you can continue later. They are not sent to our server. Clearing your browser data removes them. The resume you add is also kept in this browser tab until you close it, so other tools on the site can use it without a second upload.</p>
 ${cfg.community ? `<h2>Sharing a hiring post</h2><p>When you share a post, we receive your name and college or company email, the post text and the links you add. Your name and email are used only to review the submission; they are never shown on the site and are deleted when the post expires, within 7 days at most. The post itself, without your details, is shown for 3 days after approval. Only share posts that were made public by the employer or recruiter.</p>` : ""}
 <h2>Technical records</h2><p>Our host (Cloudflare) processes IP addresses to deliver and protect the site. For the daily AI limit we store a scrambled code made from your IP address and the date for up to one day.</p>
 <h2>Your choices</h2><p>You can use job matching and the resume score without the AI rewrite. To withdraw consent, simply stop using that feature. For questions, requests or complaints, email us. You may also approach the Data Protection Board of India where the law provides for it.</p>
