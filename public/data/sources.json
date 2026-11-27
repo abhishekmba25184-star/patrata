@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-27T09:33:14.377Z",
+ "updated": "2026-11-27T09:40:07.938Z",
  "sources": [
   {
    "name": "Groww",
@@ -450,7 +450,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 429"
+   "error": "HTTP 422"
   },
   {
    "name": "NVIDIA",
@@ -522,8 +522,9 @@
   {
    "name": "Wells Fargo",
    "ats": "workday",
-   "status": "ok",
-   "openings": 40
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Boeing",
@@ -563,8 +564,9 @@
   {
    "name": "Applied Materials",
    "ats": "workday",
-   "status": "ok",
-   "openings": 38
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Micron",
@@ -604,8 +606,9 @@
   {
    "name": "Baker Hughes",
    "ats": "workday",
-   "status": "ok",
-   "openings": 33
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "State Street",
@@ -617,9 +620,8 @@
   {
    "name": "BlackRock",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 45
   },
   {
    "name": "Nasdaq",
@@ -702,7 +704,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Deutsche Bank",
