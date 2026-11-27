@@ -341,3 +341,9 @@ function drawDonut() {
   for (const [, v, color] of parts) { const len = (v / total) * C; if (v) svg.append(ring(color, Math.max(0, len - 2), off)); off += len; }
   box.replaceChildren(svg, el("div", { class: "mid" }, el("div", {}, el("b", {}, String(state.ranked.length)), el("span", {}, "openings checked"))));
 }
+
+// A resume checked on the ATS page arrives here without a second upload.
+try {
+  const carried = sessionStorage.getItem("patrata:resume");
+  if (carried) { sessionStorage.removeItem("patrata:resume"); $("#agree").checked = true; useText(carried); }
+} catch {}

@@ -43,7 +43,7 @@ ${schema.map(ld).join("\n")}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="logo" href="/"><span class="mark" aria-hidden="true"></span>${esc(cfg.name)}</a>
-<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">ATS score</a>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
 </div></header>
 <main id="main">
 ${body}
@@ -173,6 +173,15 @@ if (cfg.community) await write("/admin/", {
   script: '<script type="module" src="/js/admin.js"></script>'
 });
 
+const faq = list => ({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: list.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
+const ATS_FAQ = [
+  ["What is an ATS score?", "It estimates how well applicant tracking software can read your resume and how closely it matches a job. Recruiters often search and filter resumes inside this software before reading any of them."],
+  ["What is a good ATS score?", "Aim for 80 or more against the job you are applying to. Between 65 and 80 is workable. Below 65, fix the items marked in red first, since they cost the most points."],
+  ["Is my resume uploaded?", "No. The file is read inside your browser and is not sent to our server or stored."],
+  ["Should I copy every missing keyword into my resume?", "Only add a keyword if you have really used that skill and can talk about it in an interview. Use the job's own wording for things you have done."],
+  ["Do columns, tables and icons hurt an ATS score?", "Often, yes. Some systems read two-column layouts in the wrong order and skip icons. A single-column resume with plain headings is the safest choice."]
+];
+
 // Home
 const faqHtml = FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
 await write("/", {
@@ -252,12 +261,48 @@ for (const g of GUIDES) {
 await write("/guides/", { title: `Resume and job search guides for students | ${cfg.name}`, desc: "Practical guides on ATS resumes, MBA fresher resumes, off-campus job search and avoiding fake job offers.",
   body: `<div class="wrap article"><h1>Guides for students</h1>${GUIDES.map(g => `<h2><a href="/guides/${g.slug}/">${esc(g.title)}</a></h2><p>${esc(g.desc)}</p>`).join("")}</div>` });
 
-await write("/resume-checker/", { title: `Free resume checker for freshers in India (ATS friendly) | ${cfg.name}`, desc: "Check your resume for free: contact details, sections, measurable results, action verbs, length and job keyword gaps. The check runs in your browser.",
-  schema: [crumbs([["Resume checker", "/resume-checker/"]])],
-  body: `<div class="wrap article"><h1>Free resume checker for freshers</h1><p>Upload your resume on the home page and open the Improve resume tab. The score is calculated in your browser and the file is not uploaded.</p><p><a class="btn" href="/#start">Check my resume</a></p>
-<h2>What the score looks at</h2><table><thead><tr><th>Check</th><th>Points</th><th>What earns them</th></tr></thead><tbody>
-<tr><td>Results with numbers</td><td>25</td><td>Most experience points show scale or outcome</td></tr><tr><td>Standard sections</td><td>20</td><td>Education, experience, projects and skills under plain headings</td></tr><tr><td>Strong opening verbs</td><td>20</td><td>Points begin with what you did</td></tr><tr><td>Contact details</td><td>10</td><td>Email and mobile number</td></tr><tr><td>Clear wording</td><td>10</td><td>No "responsible for" or "worked on"</td></tr><tr><td>Skills listed</td><td>10</td><td>Recognisable tools and methods</td></tr><tr><td>Length</td><td>5</td><td>About one page</td></tr></tbody></table>
-<p>The score is a writing and structure guide. It is not the score of any employer's software, and a high number does not guarantee a shortlist.</p><p>Read the <a href="/guides/ats-resume-for-freshers/">ATS resume guide for freshers</a>.</p></div>` });
+await write("/resume-checker/", { title: `Free ATS resume score checker for students and freshers in India | ${cfg.name}`, desc: "Check your resume's ATS score for free. See if software can read it, which job keywords are missing, and exactly what to fix. Runs in your browser; your file is not uploaded.",
+  schema: [crumbs([["ATS score checker", "/resume-checker/"]]), { "@context": "https://schema.org", "@type": "WebApplication", name: `${cfg.name} ATS resume score checker`, url: `${BASE}/resume-checker/`, applicationCategory: "BusinessApplication", operatingSystem: "Any", offers: { "@type": "Offer", price: "0", priceCurrency: "INR" } }, faq(ATS_FAQ)],
+  script: `<script type="module" src="/js/atscheck.js"></script>`,
+  body: `<section class="ats-top"><div class="wrap">${trail([["ATS score checker", "/resume-checker/"]])}
+<h1>ATS resume score checker</h1>
+<p class="lead">Most companies run resumes through applicant tracking software before a recruiter reads them. Check whether yours can be read, whether it uses the job's keywords, and what to fix first.</p>
+<div class="ats-grid">
+<div class="ats-in">
+<div class="drop" id="atsdrop">
+<div class="drop-head"><span class="drop-icon" aria-hidden="true"></span><div><h2>Your resume</h2><p>PDF or Word file. It is read on your device and is not stored.</p></div></div>
+<label class="consent" id="atsconsent"><input type="checkbox" id="atsagree"><span>I am 18 or older and I agree to the <a href="/terms/">terms</a> and <a href="/privacy/">privacy notice</a>.</span></label>
+<div class="row"><button type="button" class="btn" id="atspick">Choose resume file</button><button type="button" class="btn alt" id="atspastebtn">Paste text instead</button></div>
+<input type="file" id="atsfile" accept=".pdf,.docx,.txt" hidden>
+<p class="filechip" id="atsfilename" hidden></p>
+<div id="atspastebox" hidden><label class="f" for="atstext">Resume text</label><textarea id="atstext"></textarea></div>
+</div>
+<div class="jdbox"><label class="f" for="atsjd">Job description <span class="opt">optional, for a keyword match</span></label><textarea id="atsjd" placeholder="Paste the full job description from the company or job site"></textarea></div>
+<button type="button" class="btn big" id="atsgo">Check my ATS score</button>
+<p class="status" id="atsmsg" role="status"></p>
+</div>
+<div class="ats-out" id="atsout" aria-live="polite">
+<div class="gauge empty" id="gauge"><svg viewBox="0 0 220 130" aria-hidden="true"><path class="track" d="M20 115 A90 90 0 0 1 200 115"/><path class="fill" id="gaugefill" d="M20 115 A90 90 0 0 1 200 115" pathLength="100"/></svg><div class="gnum"><b id="gscore">?</b><span id="ggrade">out of 100</span></div></div>
+<ul class="ats-list" id="atslist">
+<li class="ghost"><span></span>Readable by ATS software</li><li class="ghost"><span></span>Contact details</li><li class="ghost"><span></span>Standard section headings</li><li class="ghost"><span></span>Keyword match with the job</li><li class="ghost"><span></span>Results with numbers</li><li class="ghost"><span></span>Action verbs and clear wording</li><li class="ghost"><span></span>Dates on experience</li><li class="ghost"><span></span>Length</li>
+</ul>
+<div id="atskw"></div>
+<div class="row" id="atsnext" hidden><button type="button" class="btn" id="atsjobs">See jobs this resume fits</button><button type="button" class="btn alt" id="atsagain">Check another resume</button></div>
+</div>
+</div></div></section>
+<div class="wrap article">
+<h2>What the ATS score looks at</h2><table><thead><tr><th>Check</th><th>Points</th><th>What earns them</th></tr></thead><tbody>
+<tr><td>Keyword match with the job</td><td>25</td><td>Your resume uses the skills and terms the job description repeats</td></tr>
+<tr><td>Readable by ATS software</td><td>20</td><td>PDF or Word file, one column, no icons in place of words</td></tr>
+<tr><td>Standard section headings</td><td>15</td><td>Education, Experience, Projects and Skills under plain headings</td></tr>
+<tr><td>Contact details</td><td>10</td><td>Email, mobile number and LinkedIn link</td></tr>
+<tr><td>Results with numbers</td><td>10</td><td>Points show scale, percentages, money or time saved</td></tr>
+<tr><td>Action verbs and clear wording</td><td>10</td><td>Points start with what you did, without "responsible for"</td></tr>
+<tr><td>Dates on experience</td><td>5</td><td>Each role and degree has a date such as Jun 2024</td></tr>
+<tr><td>Length</td><td>5</td><td>About one page for students</td></tr></tbody></table>
+<p>Each company's software is set up differently, so no outside tool can show the exact score an employer sees. This check follows what these systems commonly read, and a high score does not guarantee a shortlist.</p>
+${ATS_FAQ.map(([q, a]) => `<h3>${esc(q)}</h3><p>${esc(a)}</p>`).join("")}
+<p>Read the <a href="/guides/ats-resume-for-freshers/">ATS resume guide for freshers</a>.</p></div>` });
 
 await write("/about/", { title: `About ${cfg.name}`, desc: `Why ${cfg.name} was built for students and freshers in India.`,
   body: `<div class="wrap article"><h1>About ${esc(cfg.name)}</h1><p>Students often apply to openings they are not eligible for and miss the ones they are. ${esc(cfg.name)} reads your resume, compares it with the conditions written in each job post and shows the result openly, so you can spend your effort where it counts.</p><h2>How we work</h2><ul><li>Every listing links to its source, where you apply.</li><li>We do not charge students to apply.</li><li>The AI is instructed never to invent experience, and you approve each change.</li></ul><h2>Contact</h2><p>${mail}</p></div>` });
