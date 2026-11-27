@@ -43,7 +43,7 @@ ${schema.map(ld).join("\n")}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
 <a class="logo" href="/"><span class="mark" aria-hidden="true"></span>${esc(cfg.name)}</a>
-<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a><a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
+<nav aria-label="Main"><a href="/#start">Match my resume</a><a href="/jobs/">Jobs by role</a><a href="/resume-checker/">Resume checker</a>${cfg.community ? '<a href="/community/">Community posts</a>' : ""}<a href="/guides/">Guides</a><a href="/#saved" id="navsaved" hidden>Saved jobs <b id="navcount"></b></a></nav>
 </div></header>
 <main id="main">
 ${body}
@@ -123,14 +123,65 @@ const specPanels = specs.map((x, k) => `<div role="tabpanel" id="spp-${x.slug}" 
 <p class="spec-cta"><a class="btn" href="/#start">Check my eligibility for these</a><a class="btn alt" href="/jobs/${x.slug}-jobs/">All ${esc(x.name.toLowerCase())} openings</a></p>
 </div>`).join("\n");
 
+const DOMAIN_OPTIONS = ["auto", ...Object.keys(ROLE_PAGES)].map(d => `<option value="${esc(d)}">${d === "auto" ? "Detect from the post" : esc(d)}</option>`).join("");
+if (cfg.community) await write("/community/", {
+  title: `Hiring posts shared by students and recruiters | ${cfg.name}`,
+  desc: "Fresh job and internship openings shared by students and recruiters, sorted by specialisation. Every post is reviewed and stays up for 3 days.",
+  schema: [crumbs([["Community posts", "/community/"]])],
+  body: `<section class="band white"><div class="wrap">
+<p class="crumbs"><a href="/">Home</a> / Community posts</p>
+<div class="sec-head"><h1>Hiring posts shared by the community</h1><p>Openings that students and recruiters spotted on LinkedIn, in WhatsApp groups and by email. Each post is reviewed before it appears and stays up for 3 days.</p></div>
+<div id="cm-off" class="notice" hidden><strong>The community board is opening soon.</strong> Meanwhile, paste any post into "Check a job post" after you upload your resume on the <a href="/#start">home page</a>.</div>
+<div id="cm-on" hidden>
+<p class="spec-cta" style="margin:0 0 20px"><a class="btn" href="#share">Share a hiring post</a><a class="btn alt" href="/#start">Check my eligibility</a></p>
+<div class="chips" id="cm-tabs" role="tablist" aria-label="Filter by specialisation"></div>
+<div id="cm-list" class="cm-list" aria-live="polite"></div>
+</div>
+</div></section>
+<section class="band" id="share"><div class="wrap">
+<div class="sec-head"><h2>Share a hiring post</h2><p>Open to college and company email addresses. Paste the post and we fill in the details for you; check them before sending.</p></div>
+<form class="panel cm-form" id="cm-form" novalidate>
+<div class="formgrid">
+<div class="wide"><label class="f" for="cm-name">Your name</label><input type="text" id="cm-name" autocomplete="name" maxlength="60"></div>
+<div class="wide"><label class="f" for="cm-email">Your college or company email</label><input type="text" id="cm-email" autocomplete="email" inputmode="email" maxlength="120" placeholder="name@college.ac.in"></div>
+<div class="full"><label class="f" for="cm-text">Post text</label><textarea id="cm-text" placeholder="Paste the full hiring post here"></textarea></div>
+<div class="wide"><label class="f" for="cm-role">Role</label><input type="text" id="cm-role" maxlength="120"></div>
+<div><label class="f" for="cm-company">Company</label><input type="text" id="cm-company" maxlength="80"></div>
+<div><label class="f" for="cm-location">Location</label><input type="text" id="cm-location" maxlength="120"></div>
+<div><label class="f" for="cm-domain">Specialisation</label><select id="cm-domain">${DOMAIN_OPTIONS}</select></div>
+<div class="wide"><label class="f" for="cm-apply">Apply link</label><input type="text" id="cm-apply" inputmode="url" placeholder="https://"></div>
+<div class="wide"><label class="f" for="cm-applyemail">Or apply by email</label><input type="text" id="cm-applyemail" inputmode="email"></div>
+<div class="full"><label class="f" for="cm-source">Link to the original post (optional)</label><input type="text" id="cm-source" inputmode="url" placeholder="https://www.linkedin.com/posts/..."></div>
+<div class="hp" aria-hidden="true"><label for="cm-website">Website</label><input type="text" id="cm-website" tabindex="-1" autocomplete="off"></div>
+<label class="consent full"><input type="checkbox" id="cm-confirm"><span>This is a genuine opening that was shared publicly, and it does not ask candidates to pay anything.</span></label>
+</div>
+<p style="margin-top:18px"><button class="btn" id="cm-send">Send for review</button></p>
+<p class="status" id="cm-msg" role="status"></p>
+</form>
+</div></section>`,
+  script: '<script type="module" src="/js/community.js"></script>'
+});
+if (cfg.community) await write("/admin/", {
+  title: `Review community posts | ${cfg.name}`, desc: "Private review page.", index: false,
+  body: `<section class="band white"><div class="wrap">
+<div class="sec-head"><h1>Review community posts</h1><p>Approve genuine openings. Approved posts go live for 3 days, then disappear.</p></div>
+<form class="addrow" id="ad-login"><input type="password" id="ad-token" placeholder="Admin password" aria-label="Admin password" autocomplete="current-password"><button class="btn small">Open</button></form>
+<p class="status" id="ad-msg" role="status"></p>
+<div id="ad-panel" hidden><h2 style="margin-top:20px">Waiting for review <span id="ad-pcount"></span></h2><div id="ad-pending" class="cm-list"></div>
+<h2 style="margin-top:34px">Live now <span id="ad-lcount"></span></h2><div id="ad-live" class="cm-list"></div></div>
+</div></section>`,
+  script: '<script type="module" src="/js/admin.js"></script>'
+});
+
 // Home
 const faqHtml = FAQ.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
 await write("/", {
   title: `${cfg.name}: Match your resume to jobs and check eligibility | Freshers India`,
   desc: "Upload your resume and find fresher jobs and internships in India that fit it. See eligibility for each opening, score your resume and improve it. Free for students.",
   body: home.replace("{{OPENINGS}}", fmt(highlights.openings)).replace("{{EMPLOYERS}}", fmt(highlights.employers)).replace("{{CITIES}}", fmt(highlights.cities))
+    .replaceAll("{{MARQUEE}}", Object.entries(byEmployer).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)} open</span></li>`).join(""))
     .replace("{{EMPLOYER_LIST}}", highlights.top.map(([n, c]) => `<li><b>${esc(n)}</b><span>${fmt(c)}</span></li>`).join(""))
-    .replace("{{SPEC_TABS}}", specTabs).replace("{{SPEC_PANELS}}", specPanels).replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
+    .replace(/<!--community-->[\s\S]*?<!--\/community-->/, cfg.community ? "$&" : "").replace("{{SPEC_TABS}}", specTabs).replace("{{SPEC_PANELS}}", specPanels).replace("{{FAQ}}", faqHtml).replace("{{DIRECTORY}}", Object.entries(ROLE_PAGES).map(([n, r]) => `<li><a href="/jobs/${r.slug}-jobs/">${esc(n)} jobs</a></li>`).join("")),
   schema: [
     { "@context": "https://schema.org", "@type": "Organization", name: cfg.name, url: BASE, logo: `${BASE}/favicon.svg`, ...(hasEmail ? { email: cfg.email } : {}) },
     { "@context": "https://schema.org", "@type": "WebSite", name: cfg.name, url: BASE, inLanguage: "en-IN" },
@@ -216,6 +267,7 @@ await write("/privacy/", { title: `Privacy notice | ${cfg.name}`, desc: "What ha
 <h2>Your resume</h2><p>The file is read inside your browser. We do not upload or save it, and we run no accounts or resume database. Closing the page clears it.</p>
 <h2>Job search</h2><p>When live search is on, our server receives the role type, city and experience level you chose, and passes a search phrase to the job search providers we use (Careerjet and OpenWeb Ninja JSearch). Careerjet also requires your IP address and browser type with each search. Your resume is not sent.</p>
 <h2>AI rewrite</h2><p>Only if you tick the consent box and press the button, resume text and any job description you pasted go through our server to Google's Gemini API. The software first removes email addresses, phone numbers, links, your detected name and some personal lines. Automatic removal can miss details, so delete anything private before using it. Depending on the plan used, Google may keep this text, have people review it and use it to improve its services. See Google's Gemini API terms.</p>
+${cfg.community ? `<h2>Sharing a hiring post</h2><p>When you share a post, we receive your name and college or company email, the post text and the links you add. Your name and email are used only to review the submission; they are never shown on the site and are deleted when the post expires, within 7 days at most. The post itself, without your details, is shown for 3 days after approval. Only share posts that were made public by the employer or recruiter.</p>` : ""}
 <h2>Technical records</h2><p>Our host (Cloudflare) processes IP addresses to deliver and protect the site. For the daily AI limit we store a scrambled code made from your IP address and the date for up to one day.</p>
 <h2>Your choices</h2><p>You can use job matching and the resume score without the AI rewrite. To withdraw consent, simply stop using that feature. For questions, requests or complaints, email us. You may also approach the Data Protection Board of India where the law provides for it.</p>
 <h2>Age</h2><p>This service is for people aged 18 or older.</p></div>` });
@@ -227,5 +279,5 @@ await write("/404.html", { title: `Page not found | ${cfg.name}`, desc: "This pa
 
 const day = (data.updated || new Date().toISOString()).slice(0, 10);
 await writeFile(new URL("public/sitemap.xml", root), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(p => `<url><loc>${BASE}${p}</loc>${p.startsWith("/jobs/") && data.updated ? `<lastmod>${day}</lastmod>` : ""}</url>`).join("\n")}\n</urlset>\n`);
-await writeFile(new URL("public/robots.txt", root), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${BASE}/sitemap.xml\n`);
+await writeFile(new URL("public/robots.txt", root), `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nSitemap: ${BASE}/sitemap.xml\n`);
 console.log(`Built ${pages.length} indexable pages.`);

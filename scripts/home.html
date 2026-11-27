@@ -18,6 +18,16 @@
 <p class="status" id="status" role="status"></p>
 </div>
 </div>
+<div class="scene">
+<div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
+<div class="resume-card" aria-hidden="true">
+<div class="rc-head"><span class="rc-avatar"></span><div><i style="width:62%"></i><i style="width:40%"></i></div></div>
+<div class="rc-sec"><b></b><i style="width:92%"></i><i style="width:78%"></i></div>
+<div class="rc-sec"><b></b><i style="width:88%"></i><i style="width:70%"></i><i style="width:82%"></i></div>
+<div class="rc-sec"><b></b><i style="width:60%"></i><i style="width:74%"></i></div>
+<div class="beam"></div>
+</div>
+<div class="floaters" aria-hidden="true"><span class="fl f1">MBA, 2027</span><span class="fl f2">13 months work</span><span class="fl f3">SQL</span><span class="fl f4">Excel</span><span class="fl f5">CGPA 8.1</span></div>
 <figure class="slip live" id="slip" aria-label="Example of an eligibility check">
 <figcaption id="slipcap">Example check for a 2027 MBA fresher</figcaption>
 <header><div><h2 id="sliptitle">Management Trainee, Finance</h2><p id="slipco">Example company, Mumbai</p></div><span class="stamp check" id="slipstamp">Check criteria</span></header>
@@ -32,6 +42,10 @@
 </div>
 <footer class="slipnav" id="slipnav" hidden><div class="dots" id="slipdots" role="tablist" aria-label="Example openings"></div><a id="sliplink" href="/#start" target="_blank" rel="noopener nofollow">View this opening</a></footer>
 </figure>
+</div>
+</div></section>
+<section class="marquee" aria-label="Employers with openings today"><div class="track">
+<ul>{{MARQUEE}}</ul><ul aria-hidden="true">{{MARQUEE}}</ul>
 </div></section>
 
 <section class="band saved" id="saved" hidden><div class="wrap">
@@ -68,7 +82,7 @@
 
 <div data-panel="jobs">
 <div class="notice" id="samplenote" hidden><strong>These are example listings, not real openings.</strong> Live job data has not been loaded on this site yet. Use "More places to search" for real openings.</div>
-<div class="count" id="counts"></div>
+<div class="summary"><div class="donut" id="donut" role="img" aria-label="Share of openings by eligibility"></div><div class="count" id="counts"></div></div>
 <p id="freshness" style="margin-bottom:14px"></p>
 <div class="results">
 <aside class="filters" aria-label="Filter jobs">
@@ -112,10 +126,10 @@
 <section class="band"><div class="wrap">
 <div class="sec-head"><h2>From resume to application</h2></div>
 <ol class="steps">
-<li><h3>Upload</h3><p>Add your resume as a PDF or Word file.</p></li>
-<li><h3>Confirm</h3><p>Check the degree, batch, experience and skills we read.</p></li>
-<li><h3>Compare</h3><p>See each opening marked eligible, to be checked, or not yet eligible, with the reason.</p></li>
-<li><h3>Improve and apply</h3><p>Tailor your resume, then apply on the source site.</p></li>
+<li><span class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6h17l9 9v27H12z"/><path d="M29 6v9h9"/><path d="M25 36V22m-6 6 6-6 6 6"/></svg></span><h3>Upload</h3><p>Add your resume as a PDF or Word file. It stays on your device.</p></li>
+<li><span class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="7" width="30" height="36"/><path d="M15 17l3 3 6-6M15 29l3 3 6-6M28 18h6M28 30h6"/></svg></span><h3>Confirm</h3><p>Check the degree, batch, experience and skills we read.</p></li>
+<li><span class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 8v32M10 40h28M14 14h20"/><path d="M14 14l-6 14h12zM34 14l-6 14h12z"/></svg></span><h3>Compare</h3><p>See each opening marked eligible, to be checked, or not yet eligible, with the reason.</p></li>
+<li><span class="ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 23l36-15-13 34-6-14z"/><path d="M23 28l19-20"/></svg></span><h3>Improve and apply</h3><p>Tailor your resume, then apply on the source site.</p></li>
 </ol>
 </div></section>
 
@@ -124,6 +138,12 @@
 <div class="spec-wrap"><div class="spec-tabs" role="tablist" aria-label="Specialisations">{{SPEC_TABS}}</div>
 <div class="spec-panels">{{SPEC_PANELS}}</div></div>
 </div></section>
+
+<!--community--><section class="band cm-home" id="community" hidden><div class="wrap">
+<div class="sec-head"><h2>Fresh hiring posts from the community</h2><p>Shared by students and recruiters, reviewed, and up for 3 days only.</p></div>
+<div id="cm-home" class="cm-mini"></div>
+<p class="spec-cta"><a class="btn" href="/community/">See all community posts</a><a class="btn alt" href="/community/#share">Share a hiring post</a></p>
+</div></section><!--/community-->
 
 <section class="band employers"><div class="wrap">
 <div class="sec-head"><h2>Who is hiring today</h2><p>Openings collected from official career pages, with the number currently open in India.</p></div>

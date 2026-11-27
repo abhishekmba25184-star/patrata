@@ -113,7 +113,7 @@ export function fromWorkday(list, details, company, c) {
   });
 }
 
-const WORKDAY_MAX = 150;
+const WORKDAY_MAX = 120;
 // Workday sites limit request rates. Each company gets a few minutes at most, and all Workday
 // companies together get a time budget, so one slow site cannot hold up the daily refresh.
 const WORKDAY_BUDGET = 25 * 60 * 1000;
@@ -129,7 +129,7 @@ async function workday(c) {
   const base = india ? { appliedFacets: { [india.param]: [india.id] }, searchText: "" } : { appliedFacets: {}, searchText: "India" };
   const list = [];
   for (let offset = 0; list.length < WORKDAY_MAX && Date.now() < deadline; offset += 20) {
-    await sleep(400);
+    await sleep(1500);
     const body = await post({ ...base, limit: 20, offset });
     const page = body.jobPostings || [];
     list.push(...page);
@@ -138,9 +138,9 @@ async function workday(c) {
   const trimmed = list.slice(0, WORKDAY_MAX);
   // Descriptions are optional: stop asking for them if the site starts refusing or time runs out.
   let refusals = 0;
-  const details = await pool(trimmed, 2, async j => {
+  const details = await pool(trimmed.slice(0, 60), 1, async j => {
     if (refusals >= 3 || Date.now() > deadline) return null;
-    await sleep(250);
+    await sleep(900);
     try { return await getJson(`${api}${j.externalPath}`, {}, 1); } catch (e) { refusals++; return null; }
   });
   return fromWorkday(trimmed, details, c.name, c);
@@ -210,7 +210,10 @@ async function discover(name, deadline) {
       // Accept a board only if it has openings in India, so a same-named company abroad is not mixed in.
       const jobs = await fetchCompany(c, 0);
       if (jobs.some(j => inIndia(`${j.location}; ${j.where}`))) return c;
-    } catch (e) { if (!/HTTP 404|HTTP 410|HTTP 400/.test(e.message)) unsure = true; }
+    } catch (e) {
+      // Only "too many requests", server trouble or a timeout leave the answer open; a missing board is a no.
+      if (/HTTP (429|5\d\d)|time budget|aborted|timeout/i.test(`${e.name} ${e.message}`)) unsure = true;
+    }
   }
   return unsure ? undefined : null;
 }
@@ -244,14 +247,22 @@ async function main() {
       return { c, status: "skip", error: e.message, jobs: fresh ? previous.jobs.filter(j => j.company === c.name) : [] };
     }
   };
-  const [others, slow] = await Promise.all([pool(companies.filter(c => c.ats !== "workday"), 8, collect), pool(companies.filter(c => c.ats === "workday"), 1, collect)]);
+  // Workday limits requests from one place, so each run visits half of the Workday companies
+  // (alternating by run) and keeps the other half's openings from the previous run.
+  const half = Math.floor(Date.now() / (6 * 36e5)) % 2;
+  const workdays = companies.filter(c => c.ats === "workday");
+  const keepOld = c => ({ c, status: "ok", kept: true, jobs: previous.jobs.filter(j => j.company === c.name) });
+  const [others, slow] = await Promise.all([
+    pool(companies.filter(c => c.ats !== "workday"), 8, collect),
+    pool(workdays, 1, (c, k) => (k % 2 === half || !previous.jobs.some(j => j.company === c.name) ? collect(c) : keepOld(c)))
+  ]);
   const results = [...others, ...slow];
   const seen = new Set(), jobs = [];
   for (const r of results) for (const j of r.jobs) {
     const k = `${j.company}|${j.title}|${j.location}`.toLowerCase();
     if (!seen.has(k)) { seen.add(k); jobs.push(j); }
   }
-  const report = results.map(r => ({ name: r.c.name, ats: r.c.ats, status: r.status, openings: r.status === "ok" ? r.jobs.length : 0, ...(r.error ? { error: r.error } : {}) }));
+  const report = results.map(r => ({ name: r.c.name, ats: r.c.ats, status: r.status, openings: r.status === "ok" ? r.jobs.length : 0, ...(r.kept ? { note: "kept from last run" } : {}), ...(r.error ? { error: r.error } : {}) }));
   report.forEach(r => console.log(`${r.status === "ok" ? "OK  " : "SKIP"}  ${r.name}: ${r.status === "ok" ? `${r.openings} India openings` : r.error}`));
   console.log(`Total: ${jobs.length} from ${report.filter(r => r.openings).length} employers`);
   if (!jobs.length) { console.error("No jobs collected. Existing file left unchanged."); process.exit(1); }

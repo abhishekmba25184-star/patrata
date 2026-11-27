@@ -103,6 +103,33 @@ function specTabs() {
   });
 }
 
+// Latest community posts on the home page (the section stays hidden when there are none).
+async function community() {
+  if (!$("#cm-home")) return; // board switched off
+  let d = null;
+  try { const r = await fetch("/api/community"); d = r.ok ? await r.json() : null; } catch { d = null; }
+  const list = (d?.posts || []).slice(0, 4);
+  if (!list.length || !$("#cm-home")) return;
+  $("#cm-home").replaceChildren(...list.map(p => {
+    const a = make("a", "cm-mini-item");
+    a.href = "/community/";
+    a.append(make("b", "", p.title), make("span", "", `${p.company}, ${p.location}`), make("span", "tag", (p.roles || [])[0] || "General"));
+    return a;
+  }));
+  $("#community").hidden = false;
+}
+
+// Sections glide in once as they scroll into view.
+function reveal() {
+  if (still || !("IntersectionObserver" in window)) return;
+  document.documentElement.classList.add("motion");
+  const targets = document.querySelectorAll(".sec-head, .steps li, .spec-wrap, .emplist li, .faq details, .dir li, .stats div");
+  const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("shown"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+  targets.forEach((t, k) => { t.classList.add("reveal"); t.style.setProperty("--d", `${(k % 6) * 70}ms`); io.observe(t); });
+}
+
+reveal();
 countUp();
 slip();
+community();
 specTabs();

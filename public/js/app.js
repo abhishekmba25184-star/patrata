@@ -147,9 +147,10 @@ async function getJson(url) {
 async function loadJobs(p) {
   const city = p.cities[0] || "";
   const shard = r => (r ? r.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "other");
-  const [shards, live] = await Promise.all([
+  const [shards, live, community] = await Promise.all([
     Promise.all([...p.roles, ""].map(r => getJson(`/data/jobs/${shard(r)}.json`))),
-    Promise.all(p.roles.slice(0, 3).map(r => getJson(`/api/jobs?${new URLSearchParams({ role: r, city, level: p.experienceYears < 1 ? "entry" : "any" })}`)))
+    Promise.all(p.roles.slice(0, 3).map(r => getJson(`/api/jobs?${new URLSearchParams({ role: r, city, level: p.experienceYears < 1 ? "entry" : "any" })}`))),
+    document.getElementById("community") ? getJson("/api/community") : null
   ]);
   // Before the first daily refresh, the split files do not exist yet.
   const stored = shards.some(Boolean) ? { updated: shards.find(Boolean).updated, jobs: shards.flatMap(x => x?.jobs || []) } : await getJson("/data/jobs.json");
@@ -157,6 +158,8 @@ async function loadJobs(p) {
   state.updated = stored?.updated || null;
   jobs = jobs.concat(live.flatMap(x => x?.jobs || []).map(normaliseJob));
   state.liveCount = live.reduce((n, x) => n + (x?.jobs?.length || 0), 0);
+  // Community posts are already in the site's job shape; they go first so fresh shares are seen.
+  if (community?.posts?.length) jobs = community.posts.concat(jobs);
   state.sample = !jobs.length;
   if (state.sample) jobs = ((await getJson("/data/sample-jobs.json"))?.jobs || []).map(normaliseJob);
   const seen = new Set();
@@ -172,7 +175,7 @@ function jobCard(r) {
   return el("article", { class: `job ${r.verdict}-v` },
     el("div", { class: "job-top" },
       el("div", {}, el("h3", {}, fresh && el("span", { class: "new" }, "New"), j.title), el("div", { class: "meta" }, el("strong", {}, j.company), el("span", {}, j.location), posted && el("span", {}, `Updated ${posted}`), el("span", {}, `Source: ${j.source}`))),
-      el("div", {}, el("span", { class: `stamp ${r.verdict}` }, VERDICT[r.verdict]), el("div", { class: "fit" }, `${r.score}% fit`, el("div", { class: "meter", "aria-hidden": "true" }, el("span", { style: `width:${r.score}%` }))))),
+      el("div", {}, el("span", { class: `stamp ${r.verdict}` }, VERDICT[r.verdict]), el("div", { class: "ring", role: "img", "aria-label": `${r.score}% fit`, "data-p": r.score }, el("span", {}, `${r.score}%`)))),
     el("div", { class: "chips" }, r.matched.map(s => el("span", { class: "chip have" }, `✓ ${s}`)), r.missing.slice(0, 6).map(s => el("span", { class: "chip miss" }, `Not on resume: ${s}`))),
     el("details", {}, el("summary", {}, "Eligibility check and job summary"),
       el("ul", { class: "checks" }, r.checks.map(c => el("li", { class: c.state }, el("span", { class: "tick", "aria-label": c.state }), el("b", {}, c.name), el("span", {}, c.detail)))),
@@ -198,6 +201,7 @@ function filtered() {
 function render() {
   $("#samplenote").hidden = !state.sample;
   $("#freshness").textContent = state.updated ? `Career page openings last refreshed ${new Date(state.updated).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}.` : "";
+  drawDonut();
   $("#counts").replaceChildren(...Object.entries(VERDICT).map(([k, label]) =>
     el("button", { type: "button", class: k, "aria-pressed": String(state.filter.verdict === k), onclick: () => { state.filter.verdict = state.filter.verdict === k ? "" : k; state.shown = 20; render(); } },
       el("strong", { "data-n": state.ranked.filter(r => r.verdict === k).length }, String(state.ranked.filter(r => r.verdict === k).length)), label)));
@@ -212,6 +216,7 @@ function render() {
   const cards = list.slice(0, state.shown).map(jobCard);
   if (state.fresh && !still) cards.slice(0, 8).forEach((c, k) => { c.classList.add("enter"); c.style.setProperty("--n", k); });
   state.fresh = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => $$(".ring[data-p]").forEach(n => n.style.setProperty("--p", n.dataset.p))));
   $("#list").replaceChildren(...(list.length ? cards
     : [el("div", { class: "empty" }, el("h3", {}, "No jobs match these choices"), el("p", {}, "Clear a filter, add another kind of role, or open the More places to search tab."))]));
   $("#more").hidden = list.length <= state.shown;
@@ -314,4 +319,25 @@ function emailApply(text, title) {
       el("a", { class: "btn small", href: "#", onclick: e => { e.preventDefault(); location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent($("#maildraft").value)}`; } }, "Open in my email app"),
       el("button", { type: "button", class: "btn alt small", onclick: async e => { try { await navigator.clipboard.writeText($("#maildraft").value); e.target.textContent = "Copied ✓"; } catch { $("#maildraft").select(); } } }, "Copy the email")),
     el("p", { class: "fineprint" }, "Attach your resume yourself in your email app before sending."));
+}
+
+// Ring chart of eligible / check / not yet, drawn above the three totals.
+function drawDonut() {
+  const box = $("#donut");
+  if (!box) return;
+  const n = k => state.ranked.filter(r => r.verdict === k).length;
+  const parts = [["eligible", n("eligible"), "#1f3fa8"], ["check", n("check"), "#6f9be6"], ["no", n("no"), "#d98b7f"]];
+  const total = parts.reduce((a, p) => a + p[1], 0) || 1, C = 2 * Math.PI * 62;
+  let off = 0;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 160 160");
+  const ring = (color, len, offset) => {
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    Object.entries({ cx: 80, cy: 80, r: 62, stroke: color, "stroke-dasharray": `0 ${C}`, "stroke-dashoffset": -offset }).forEach(([k, v]) => c.setAttribute(k, v));
+    requestAnimationFrame(() => requestAnimationFrame(() => c.setAttribute("stroke-dasharray", `${len} ${C - len}`)));
+    return c;
+  };
+  svg.append(ring("#e2e8f6", C, 0));
+  for (const [, v, color] of parts) { const len = (v / total) * C; if (v) svg.append(ring(color, Math.max(0, len - 2), off)); off += len; }
+  box.replaceChildren(svg, el("div", { class: "mid" }, el("div", {}, el("b", {}, String(state.ranked.length)), el("span", {}, "openings checked"))));
 }
