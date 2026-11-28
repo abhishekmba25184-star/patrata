@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-28T01:57:25.940Z",
+ "updated": "2026-11-28T10:21:15.985Z",
  "sources": [
   {
    "name": "Groww",
@@ -644,7 +644,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 429"
+   "error": "HTTP 422"
   },
   {
    "name": "NVIDIA",
@@ -657,7 +657,8 @@
    "name": "Salesforce",
    "ats": "workday",
    "status": "ok",
-   "openings": 17
+   "openings": 17,
+   "note": "kept from last run"
   },
   {
    "name": "Adobe",
@@ -685,7 +686,7 @@
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 422"
+   "error": "HTTP 429"
   },
   {
    "name": "Intel",
@@ -704,9 +705,9 @@
   {
    "name": "Target",
    "ats": "workday",
-   "status": "ok",
-   "openings": 39,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "HP",
@@ -718,37 +719,37 @@
   {
    "name": "Wells Fargo",
    "ats": "workday",
-   "status": "ok",
-   "openings": 38,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Boeing",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 18,
+   "note": "kept from last run"
   },
   {
    "name": "Novartis",
    "ats": "workday",
-   "status": "ok",
-   "openings": 35,
-   "note": "kept from last run"
-  },
-  {
-   "name": "Workday",
-   "ats": "workday",
    "status": "skip",
    "openings": 0,
    "error": "HTTP 429"
   },
   {
-   "name": "Chevron",
+   "name": "Workday",
    "ats": "workday",
    "status": "ok",
-   "openings": 30,
+   "openings": 14,
    "note": "kept from last run"
+  },
+  {
+   "name": "Chevron",
+   "ats": "workday",
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "AstraZeneca",
@@ -760,16 +761,16 @@
   {
    "name": "Applied Materials",
    "ats": "workday",
-   "status": "ok",
-   "openings": 25,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Micron",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 105,
+   "note": "kept from last run"
   },
   {
    "name": "Analog Devices",
@@ -788,37 +789,37 @@
   {
    "name": "Philips",
    "ats": "workday",
-   "status": "ok",
-   "openings": 34,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "GE HealthCare",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 8,
+   "note": "kept from last run"
   },
   {
    "name": "Baker Hughes",
    "ats": "workday",
-   "status": "ok",
-   "openings": 30,
-   "note": "kept from last run"
-  },
-  {
-   "name": "State Street",
-   "ats": "workday",
    "status": "skip",
    "openings": 0,
    "error": "HTTP 429"
   },
   {
-   "name": "BlackRock",
+   "name": "State Street",
    "ats": "workday",
    "status": "ok",
-   "openings": 44,
+   "openings": 33,
    "note": "kept from last run"
+  },
+  {
+   "name": "BlackRock",
+   "ats": "workday",
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Nasdaq",
@@ -830,9 +831,9 @@
   {
    "name": "LSEG",
    "ats": "workday",
-   "status": "ok",
-   "openings": 12,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "CVS Health",
@@ -844,9 +845,9 @@
   {
    "name": "Autodesk",
    "ats": "workday",
-   "status": "ok",
-   "openings": 1,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Diageo",
@@ -858,16 +859,16 @@
   {
    "name": "Abbott",
    "ats": "workday",
-   "status": "ok",
-   "openings": 40,
-   "note": "kept from last run"
+   "status": "skip",
+   "openings": 0,
+   "error": "HTTP 429"
   },
   {
    "name": "Marsh McLennan",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 34,
+   "note": "kept from last run"
   },
   {
    "name": "Comcast",
@@ -879,9 +880,9 @@
   {
    "name": "Lowe's",
    "ats": "workday",
-   "status": "skip",
-   "openings": 0,
-   "error": "HTTP 429"
+   "status": "ok",
+   "openings": 35,
+   "note": "kept from last run"
   },
   {
    "name": "Kenvue",
@@ -894,14 +895,15 @@
    "name": "Mondelez",
    "ats": "workday",
    "status": "ok",
-   "openings": 40
+   "openings": 40,
+   "note": "kept from last run"
   },
   {
    "name": "Genpact",
    "ats": "workday",
    "status": "skip",
    "openings": 0,
-   "error": "HTTP 429"
+   "error": "HTTP 422"
   },
   {
    "name": "Deutsche Bank",
